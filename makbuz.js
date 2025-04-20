@@ -23,10 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
       input.value = decPart ? `${wholeWithDots},${decPart}` : wholeWithDots;
     }
   
-    // ---------- 2.  Tutar input alanı ----------
+    /* ---------- 2.  Tutar input alanı ---------- */
     const tutarInput = document.getElementById('tutar');
   
-    // Yazı girildikçe formatla
     tutarInput.addEventListener('input', function () {
       const posStart = this.selectionStart;
       const oldLen   = this.value.length;
@@ -47,13 +46,21 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   
-    // Formatlı değeri sayıya çevir
+    /* ---------- 3.  Formatlı değeri sayıya çevir ---------- */
     function parseFormattedNumber(value) {
-      if (!value) return 0;
-      return parseFloat(value.replace(/\./g, '').replace(',', '.'));
+      if (!value) return NaN;
+  
+      // Gizli boşluk ve NBSP’leri temizle, ayraçları dönüştür
+      const cleaned = value
+        .replace(/\s| /g, '')   // normal boşluk veya NBSP
+        .replace(/\./g, '')     // binlik noktaları
+        .replace(',', '.');     // ondalığı nokta yap
+  
+      const num = Number(cleaned);
+      return Number.isFinite(num) ? num : NaN;
     }
   
-    /* ---------- 3.  Sekmeler (Makbuz / Faiz) ---------- */
+    /* ---------- 4.  Sekmeler ---------- */
     const tabMakbuz = document.getElementById('tab-makbuz');
     const tabFaiz   = document.getElementById('tab-faiz');
     const makbuzContent = document.getElementById('makbuz-content');
@@ -73,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
       makbuzContent.style.display = 'none';
     });
   
-    /* ---------- 4.  Makbuz Hesaplama ---------- */
+    /* ---------- 5.  Makbuz Hesaplama ---------- */
     const makbuzForm   = document.getElementById('makbuz-form');
     const makbuzResult = document.getElementById('makbuz-result');
     const makbuzHistory = document.getElementById('makbuz-history');
@@ -86,12 +93,13 @@ document.addEventListener('DOMContentLoaded', function () {
       try {
         const kdvDahilToplam = parseFormattedNumber(tutarInput.value);
   
-        if (isNaN(kdvDahilToplam) || kdvDahilToplam <= 0) {
+        // --- Güncellenen kontrol ---
+        if (!Number.isFinite(kdvDahilToplam) || kdvDahilToplam <= 0) {
           alert('Lütfen geçerli bir tutar giriniz.');
           return;
         }
   
-        const kdvOrani  = parseFloat(document.getElementById('kdv-orani').value);
+        const kdvOrani    = parseFloat(document.getElementById('kdv-orani').value);
         const stopajOrani = parseFloat(document.getElementById('stopaj-orani').value);
         const tevkifatSecim = document.getElementById('tevkifat').value;
   
@@ -172,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     updateMakbuzHistory();
   
-    /* ---------- 5.  Para Format Yardımcıları ---------- */
+    /* ---------- 6.  Para Format Yardımcıları ---------- */
     function formatCurrency(amount) { return formatManualCurrency(amount) + ' ₺'; }
     function formatManualCurrency(amount) {
       const parts = amount.toFixed(2).toString().split('.');
