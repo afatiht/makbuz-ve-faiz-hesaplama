@@ -1,12 +1,13 @@
 # Serbest Meslek Makbuzu Hesaplama Aracı - Kullanım Kılavuzu (Son Versiyon)
 
 ## Genel Bakış
+NOT: Proje Manus ile geliştirilmeye başlandı. 
 
 Bu web uygulaması, Türkiye'de avukatlar için serbest meslek makbuzu hesaplamalarını ve faiz hesaplamalarını kolaylaştırmak amacıyla geliştirilmiştir. Uygulama, güncel vergi oranlarını kullanarak doğru hesaplamalar yapmanıza yardımcı olur.
 
 ## Erişim
 
-Uygulamaya şu adresten erişebilirsiniz: [https://ejwooeof.manus.space](https://ejwooeof.manus.space)
+Uygulamaya şu adresten erişebilirsiniz: [https://makbuz.vercel.app/](https://makbuz.vercel.app/)
 
 Uygulama tamamen mobil uyumludur ve herhangi bir cihazdan (bilgisayar, tablet veya akıllı telefon) kullanılabilir.
 
