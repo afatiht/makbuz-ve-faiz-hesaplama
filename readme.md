@@ -112,4 +112,4 @@ Uygulama ile ilgili sorularınız veya geri bildirimleriniz için lütfen ileti�
 
 ---
 
-© 2025 Serbest Meslek Makbuzu Hesaplama Aracı
+Uygulama baştan sona manus destekli geliştirilmiştir. 
