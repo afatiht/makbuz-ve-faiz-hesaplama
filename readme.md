@@ -1,4 +1,4 @@
-# Serbest Meslek Makbuzu Hesaplama Aracı - Kullanım Kılavuzu (Son Versiyon)
+# Serbest Meslek Makbuzu Hesaplama Aracı - Kullanım Kılavuzu 
 
 ## Genel Bakış
 
@@ -8,7 +8,6 @@ Bu web uygulaması, Türkiye'de avukatlar için serbest meslek makbuzu hesaplama
 
 Uygulamaya şu adresten erişebilirsiniz: [https://makbuz.vercel.app/](https:)
 
-Uygulama tamamen mobil uyumludur ve herhangi bir cihazdan (bilgisayar, tablet veya akıllı telefon) kullanılabilir.
 
 ## Özellikler
 
@@ -90,7 +89,7 @@ Hesaplama sonucunda şu bilgiler görüntülenir:
 
 ### KDV Oranları
 - **Genel avukatlık hizmetleri**: %20
-- **Çocuk Mahkemeleri'nde ifa edilen görevler**: %10
+
 
 ### Tevkifat (KDV Kesintisi)
 - KDV dahil 9.900 TL'yi aşan hizmetler için: %50 (5/10) oranında tevkifat uygulanır
