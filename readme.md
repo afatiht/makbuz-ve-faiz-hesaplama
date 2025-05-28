@@ -6,7 +6,7 @@ Bu web uygulaması, Türkiye'de avukatlar için serbest meslek makbuzu hesaplama
 
 ## Erişim
 
-Uygulamaya şu adresten erişebilirsiniz: [https://ejwooeof.manus.space](https://ejwooeof.manus.space)
+Uygulamaya şu adresten erişebilirsiniz: [https://makbuz.vercel.app/](https:)
 
 Uygulama tamamen mobil uyumludur ve herhangi bir cihazdan (bilgisayar, tablet veya akıllı telefon) kullanılabilir.
 
