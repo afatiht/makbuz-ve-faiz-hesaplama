@@ -189,6 +189,10 @@
                 <span class="result-label">💎 Alınan Net Ücret:</span>
                 <span class="result-value" id="net">-</span>
             </div>
+            <div class="result-item">
+                <span class="result-label">🏦 Yatırılması Gereken Tutar:</span>
+                <span class="result-value" id="yatirilacak">-</span>
+            </div>
         </div>
 
         <div class="canvas-container">
@@ -251,7 +255,8 @@
                 { label: '🏷️ KDV (%20)', value: data.kdv },
                 { label: '📉 Stopaj (%20)', value: data.stopaj },
                 { label: '⚖️ KDV Tevkifat (%50)', value: data.tevkifat },
-                { label: '💎 Alınan Net Ücret', value: data.net }
+                { label: '💎 Alınan Net Ücret', value: data.net },
+                { label: '🏦 Yatırılması Gereken Tutar', value: data.yatirilacak }
             ];
             
             let yPos = 150;
@@ -286,18 +291,29 @@
             const tevkifat = toplam >= 9900 ? kdv * 0.50 : 0;
             const net = tip === "tuzel" ? brut - stopaj : brut;
             
+            // Yatırılması gereken tutar hesaplama
+            let yatirilacak;
+            if (tip === "tuzel") {
+                // Tüzel kişi için: 9900 TL üzeri ise net + tevkifat, altında ise net + kdv
+                yatirilacak = toplam >= 9900 ? net + tevkifat : net + kdv;
+            } else {
+                // Gerçek kişi için: net + kdv
+                yatirilacak = net + kdv;
+            }
+            
             // Sonuçları güncelle
             document.getElementById("brut").textContent = brut.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             document.getElementById("kdv").textContent = kdv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             document.getElementById("stopaj").textContent = stopaj.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             document.getElementById("tevkifat").textContent = tevkifat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             document.getElementById("net").textContent = net.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("yatirilacak").textContent = yatirilacak.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             
             // Sonuçları göster
             document.getElementById("results").style.display = "block";
             
             // Canvas'ı güncelle
-            drawResults({ brut, kdv, stopaj, tevkifat, net, tip });
+            drawResults({ brut, kdv, stopaj, tevkifat, net, yatirilacak, tip });
         }
         
         function terstenHesapla(tip) {
@@ -319,18 +335,29 @@
             const tevkifat = toplam >= 9900 ? kdv * 0.50 : 0;
             const net = tip === "tuzel" ? gercekBrut - stopaj : gercekBrut;
             
+            // Yatırılması gereken tutar hesaplama
+            let yatirilacak;
+            if (tip === "tuzel") {
+                // Tüzel kişi için: 9900 TL üzeri ise net + tevkifat, altında ise net + kdv
+                yatirilacak = toplam >= 9900 ? net + tevkifat : net + kdv;
+            } else {
+                // Gerçek kişi için: net + kdv
+                yatirilacak = net + kdv;
+            }
+            
             // Sonuçları güncelle
             document.getElementById("brut").textContent = gercekBrut.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             document.getElementById("kdv").textContent = kdv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             document.getElementById("stopaj").textContent = stopaj.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             document.getElementById("tevkifat").textContent = tevkifat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             document.getElementById("net").textContent = net.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("yatirilacak").textContent = yatirilacak.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             
             // Sonuçları göster
             document.getElementById("results").style.display = "block";
             
             // Canvas'ı güncelle
-            drawResults({ brut: gercekBrut, kdv, stopaj, tevkifat, net, tip });
+            drawResults({ brut: gercekBrut, kdv, stopaj, tevkifat, net, yatirilacak, tip });
         }
         
         function temizle() {
@@ -341,6 +368,7 @@
             document.getElementById("stopaj").textContent = "-";
             document.getElementById("tevkifat").textContent = "-";
             document.getElementById("net").textContent = "-";
+            document.getElementById("yatirilacak").textContent = "-";
             document.getElementById("results").style.display = "none";
             
             // Canvas'ı temizle
