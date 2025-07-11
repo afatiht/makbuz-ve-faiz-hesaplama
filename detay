@@ -1,1 +1,364 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serbest Meslek Makbuzu Hesaplama</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+        h2 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+        .btn-clear {
+            background: #e53e3e;
+            color: white;
+        }
+        .btn-clear:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+        }
+        .canvas-container {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #e2e8f0;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 10px;
+            border-left: 4px solid #0369a1;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #cbd5e0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            color: #1a365d;
+        }
+        .result-label {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .result-value {
+            font-weight: 600;
+            color: #1a365d;
+        }
+        @media (max-width: 600px) {
+            .button-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>💼 Serbest Meslek Makbuzu Hesaplama</h2>
+        
+        <div class="input-group">
+            <label for="toplam">💰 Toplam (KDV ve Stopaj dahil):</label>
+            <input type="number" id="toplam" value="1000" placeholder="Toplam tutarı giriniz">
+        </div>
 
+        <div class="button-group">
+            <button class="btn-primary" onclick="hesapla('gercek')">👤 Gerçek Kişi</button>
+            <button class="btn-primary" onclick="hesapla('tuzel')">🏢 Tüzel Kişi</button>
+        </div>
+
+        <div class="input-group">
+            <label for="alinan">📊 Brüt Tutar (KDV Hariç - Tevkifat Dahil):</label>
+            <input type="number" id="alinan" placeholder="Tevkifat dahil brüt tutarı giriniz (İsteğe bağlı)">
+        </div>
+
+        <div class="button-group">
+            <button class="btn-secondary" onclick="terstenHesapla('gercek')">👤 Gerçek Kişi (Ters)</button>
+            <button class="btn-secondary" onclick="terstenHesapla('tuzel')">🏢 Tüzel Kişi (Ters)</button>
+            <button class="btn-clear" onclick="temizle()">🧹 Formu Temizle</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="calculatorCanvas" width="600" height="400"></canvas>
+        </div>
+
+        <div class="results" id="results" style="display: none;">
+            <div class="result-item">
+                <span class="result-label">💵 Brüt (KDV Hariç):</span>
+                <span class="result-value" id="brut">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">🏷️ KDV (%20):</span>
+                <span class="result-value" id="kdv">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">📉 Stopaj (%20):</span>
+                <span class="result-value" id="stopaj">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">⚖️ KDV Tevkifat (%50):</span>
+                <span class="result-value" id="tevkifat">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">💎 Alınan Net Ücret:</span>
+                <span class="result-value" id="net">-</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('calculatorCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Canvas başlangıç durumu
+        function drawInitialCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Gradient background
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#f0f9ff');
+            gradient.addColorStop(1, '#e0f2fe');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Başlık
+            ctx.fillStyle = '#1a365d';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Hesaplama Sonuçları', canvas.width/2, 50);
+            
+            // Bekleme mesajı
+            ctx.fillStyle = '#4a5568';
+            ctx.font = '16px Arial';
+            ctx.fillText('Hesaplama yapmak için yukarıdaki butonları kullanın', canvas.width/2, canvas.height/2);
+        }
+        
+        function drawResults(data) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Gradient background
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#f0f9ff');
+            gradient.addColorStop(1, '#e0f2fe');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Başlık
+            ctx.fillStyle = '#1a365d';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Hesaplama Sonuçları', canvas.width/2, 60);
+            
+            // Müşteri tipi
+            ctx.fillStyle = '#4a5568';
+            ctx.font = '18px Arial';
+            ctx.fillText(`Müşteri Tipi: ${data.tip === 'gercek' ? 'Gerçek Kişi' : 'Tüzel Kişi'}`, canvas.width/2, 100);
+            
+            // Sonuçlar listesi
+            const results = [
+                { label: '💵 Brüt (KDV Hariç)', value: data.brut },
+                { label: '🏷️ KDV (%20)', value: data.kdv },
+                { label: '📉 Stopaj (%20)', value: data.stopaj },
+                { label: '⚖️ KDV Tevkifat (%50)', value: data.tevkifat },
+                { label: '💎 Alınan Net Ücret', value: data.net }
+            ];
+            
+            let yPos = 150;
+            
+            results.forEach((result, index) => {
+                // Label
+                ctx.fillStyle = '#374151';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(result.label, 40, yPos);
+                
+                // Value
+                ctx.fillStyle = index === results.length - 1 ? '#059669' : '#1f2937';
+                ctx.font = index === results.length - 1 ? 'bold 18px Arial' : 'bold 16px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${result.value.toFixed(2)} TL`, canvas.width - 40, yPos);
+                
+                yPos += 40;
+            });
+        }
+        
+        function hesapla(tip) {
+            const toplam = parseFloat(document.getElementById("toplam").value);
+            if (isNaN(toplam)) {
+                alert('Lütfen geçerli bir toplam tutar giriniz');
+                return;
+            }
+            
+            const brut = toplam / 1.20;
+            const kdv = brut * 0.20;
+            const stopaj = tip === "tuzel" ? brut * 0.20 : 0;
+            const tevkifat = toplam >= 9900 ? kdv * 0.50 : 0;
+            const net = tip === "tuzel" ? brut - stopaj : brut;
+            
+            // Sonuçları güncelle
+            document.getElementById("brut").textContent = brut.toFixed(2) + " TL";
+            document.getElementById("kdv").textContent = kdv.toFixed(2) + " TL";
+            document.getElementById("stopaj").textContent = stopaj.toFixed(2) + " TL";
+            document.getElementById("tevkifat").textContent = tevkifat.toFixed(2) + " TL";
+            document.getElementById("net").textContent = net.toFixed(2) + " TL";
+            
+            // Sonuçları göster
+            document.getElementById("results").style.display = "block";
+            
+            // Canvas'ı güncelle
+            drawResults({ brut, kdv, stopaj, tevkifat, net, tip });
+        }
+        
+        function terstenHesapla(tip) {
+            const brutTevkifatDahil = parseFloat(document.getElementById("alinan").value);
+            if (isNaN(brutTevkifatDahil)) {
+                alert('Lütfen geçerli bir brüt tutar giriniz');
+                return;
+            }
+            
+            // Tevkifat dahil brüt tutardan gerçek brüt tutarı hesapla
+            // brutTevkifatDahil = gerçekBrut - (gerçekBrut * 0.20 * 0.50)
+            // brutTevkifatDahil = gerçekBrut * (1 - 0.10)
+            // gerçekBrut = brutTevkifatDahil / 0.90
+            const gercekBrut = brutTevkifatDahil / 0.90;
+            
+            const kdv = gercekBrut * 0.20;
+            const stopaj = tip === "tuzel" ? gercekBrut * 0.20 : 0;
+            const toplam = gercekBrut + kdv; // KDV ve stopaj toplamı
+            const tevkifat = toplam >= 9900 ? kdv * 0.50 : 0;
+            const net = tip === "tuzel" ? gercekBrut - stopaj : gercekBrut;
+            
+            // Sonuçları güncelle
+            document.getElementById("brut").textContent = gercekBrut.toFixed(2) + " TL";
+            document.getElementById("kdv").textContent = kdv.toFixed(2) + " TL";
+            document.getElementById("stopaj").textContent = stopaj.toFixed(2) + " TL";
+            document.getElementById("tevkifat").textContent = tevkifat.toFixed(2) + " TL";
+            document.getElementById("net").textContent = net.toFixed(2) + " TL";
+            
+            // Sonuçları göster
+            document.getElementById("results").style.display = "block";
+            
+            // Canvas'ı güncelle
+            drawResults({ brut: gercekBrut, kdv, stopaj, tevkifat, net, tip });
+        }
+        
+        function temizle() {
+            document.getElementById("toplam").value = "";
+            document.getElementById("alinan").value = "";
+            document.getElementById("brut").textContent = "-";
+            document.getElementById("kdv").textContent = "-";
+            document.getElementById("stopaj").textContent = "-";
+            document.getElementById("tevkifat").textContent = "-";
+            document.getElementById("net").textContent = "-";
+            document.getElementById("results").style.display = "none";
+            
+            // Canvas'ı temizle
+            drawInitialCanvas();
+        }
+        
+        // Sayfa yüklendiğinde başlangıç canvas'ını çiz
+        window.addEventListener('load', drawInitialCanvas);
+        
+        // Canvas boyutlandırma
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const containerWidth = container.offsetWidth - 40;
+            canvas.style.width = containerWidth + 'px';
+            canvas.style.height = (containerWidth * 0.67) + 'px';
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    </script>
+</body>
+</html>
