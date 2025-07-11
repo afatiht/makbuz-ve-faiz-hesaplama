@@ -163,7 +163,7 @@
         
         <div class="input-group">
             <label for="toplam">💰 Toplam (KDV ve Stopaj dahil):</label>
-            <input type="number" id="toplam" placeholder="Toplam tutarı giriniz">
+            <input type="text" id="toplam" placeholder="Toplam tutarı giriniz" oninput="formatInput(this)">
         </div>
 
         <div class="button-group">
@@ -173,7 +173,7 @@
 
         <div class="input-group">
             <label for="alinan">📊 Brüt Tutar (KDV Hariç - Tevkifat Dahil):</label>
-            <input type="number" id="alinan" placeholder="Tevkifat dahil brüt tutarı giriniz (İsteğe bağlı)">
+            <input type="text" id="alinan" placeholder="Tevkifat dahil brüt tutarı giriniz (İsteğe bağlı)" oninput="formatInput(this)">
         </div>
 
         <div class="button-group">
@@ -292,9 +292,35 @@
             });
         }
         
+        function formatInput(input) {
+            // Sadece rakam, nokta ve virgül karakterlerini kabul et
+            let value = input.value.replace(/[^\d.,]/g, '');
+            
+            // Virgülü noktaya çevir hesaplama için
+            let numericValue = value.replace(/\./g, '').replace(',', '.');
+            
+            // Geçerli bir sayı olup olmadığını kontrol et
+            if (numericValue && !isNaN(parseFloat(numericValue))) {
+                let number = parseFloat(numericValue);
+                
+                // Türkçe formatında göster
+                let formatted = number.toLocaleString('tr-TR', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                });
+                
+                input.value = formatted;
+            }
+        }
+        
+        function parseFormattedNumber(value) {
+            // Türkçe formatından sayıya çevir
+            return parseFloat(value.replace(/\./g, '').replace(',', '.')) || 0;
+        }
+        
         function hesapla(tip) {
-            const toplam = parseFloat(document.getElementById("toplam").value);
-            if (isNaN(toplam)) {
+            const toplam = parseFormattedNumber(document.getElementById("toplam").value);
+            if (isNaN(toplam) || toplam <= 0) {
                 alert('Lütfen geçerli bir toplam tutar giriniz');
                 return;
             }
@@ -331,8 +357,8 @@
         }
         
         function terstenHesapla(tip) {
-            const brutTevkifatDahil = parseFloat(document.getElementById("alinan").value);
-            if (isNaN(brutTevkifatDahil)) {
+            const brutTevkifatDahil = parseFormattedNumber(document.getElementById("alinan").value);
+            if (isNaN(brutTevkifatDahil) || brutTevkifatDahil <= 0) {
                 alert('Lütfen geçerli bir brüt tutar giriniz');
                 return;
             }
