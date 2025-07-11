@@ -69,21 +69,21 @@
             transition: all 0.3s;
             min-width: 120px;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        .btn-secondary {
+        .btn-gercek {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
         }
-        .btn-secondary:hover {
+        .btn-gercek:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+        .btn-tuzel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-tuzel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
         .btn-clear {
             background: #e53e3e;
@@ -125,6 +125,20 @@
             font-weight: bold;
             color: #1a365d;
         }
+        .result-item:nth-last-child(2),
+        .result-item:last-child {
+            font-size: 18px;
+            font-weight: bold;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 8px;
+            padding: 12px 8px;
+            margin: 4px 0;
+        }
+        .result-item:nth-last-child(2) .result-value,
+        .result-item:last-child .result-value {
+            color: #059669;
+            font-size: 20px;
+        }
         .result-label {
             font-weight: 600;
             color: #2d3748;
@@ -153,8 +167,8 @@
         </div>
 
         <div class="button-group">
-            <button class="btn-primary" onclick="hesapla('gercek')">👤 Gerçek Kişi</button>
-            <button class="btn-primary" onclick="hesapla('tuzel')">🏢 Tüzel Kişi</button>
+            <button class="btn-gercek" onclick="hesapla('gercek')">👤 Gerçek Kişi</button>
+            <button class="btn-tuzel" onclick="hesapla('tuzel')">🏢 Tüzel Kişi</button>
         </div>
 
         <div class="input-group">
@@ -163,8 +177,8 @@
         </div>
 
         <div class="button-group">
-            <button class="btn-secondary" onclick="terstenHesapla('gercek')">👤 Gerçek Kişi (Ters)</button>
-            <button class="btn-secondary" onclick="terstenHesapla('tuzel')">🏢 Tüzel Kişi (Ters)</button>
+            <button class="btn-gercek" onclick="terstenHesapla('gercek')">👤 Gerçek Kişi (Ters)</button>
+            <button class="btn-tuzel" onclick="terstenHesapla('tuzel')">🏢 Tüzel Kişi (Ters)</button>
             <button class="btn-clear" onclick="temizle()">🧹 Formu Temizle</button>
         </div>
 
