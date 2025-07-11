@@ -439,6 +439,33 @@
             drawInitialCanvas();
         }
         
+        // Klavye kısayolları
+        document.addEventListener('keydown', function(event) {
+            // Enter tuşu kontrolü
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Formun submit olmasını engelle
+                
+                // Hangi input alanında olduğumuzu kontrol et
+                const activeElement = document.activeElement;
+                
+                if (event.metaKey || event.ctrlKey) {
+                    // Cmd+Enter (Mac) veya Ctrl+Enter (Windows/Linux) → Tüzel kişi
+                    if (activeElement.id === 'toplam') {
+                        hesapla('tuzel');
+                    } else if (activeElement.id === 'alinan') {
+                        terstenHesapla('tuzel');
+                    }
+                } else {
+                    // Sadece Enter → Gerçek kişi
+                    if (activeElement.id === 'toplam') {
+                        hesapla('gercek');
+                    } else if (activeElement.id === 'alinan') {
+                        terstenHesapla('gercek');
+                    }
+                }
+            }
+        });
+        
         // Sayfa yüklendiğinde başlangıç canvas'ını çiz
         window.addEventListener('load', drawInitialCanvas);
         
