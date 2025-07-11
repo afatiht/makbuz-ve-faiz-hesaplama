@@ -308,20 +308,32 @@
             // Sadece rakam, nokta ve virgül karakterlerini kabul et
             let value = input.value.replace(/[^\d.,]/g, '');
             
-            // Virgülü noktaya çevir hesaplama için
-            let numericValue = value.replace(/\./g, '').replace(',', '.');
+            // Eğer virgül varsa, ondalık kısmı ayır
+            let parts = value.split(',');
+            let integerPart = parts[0].replace(/\./g, ''); // Binlik ayırıcı noktaları temizle
+            let decimalPart = parts[1] || '';
             
-            // Geçerli bir sayı olup olmadığını kontrol et
-            if (numericValue && !isNaN(parseFloat(numericValue))) {
-                let number = parseFloat(numericValue);
+            // Ondalık kısmı maksimum 2 haneli yap
+            if (decimalPart.length > 2) {
+                decimalPart = decimalPart.substring(0, 2);
+            }
+            
+            // Tam sayı kısmını formatla
+            if (integerPart && !isNaN(parseInt(integerPart))) {
+                let number = parseInt(integerPart);
+                let formattedInteger = number.toLocaleString('tr-TR');
                 
-                // Türkçe formatında göster
-                let formatted = number.toLocaleString('tr-TR', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2
-                });
-                
-                input.value = formatted;
+                // Ondalık kısım varsa ekle
+                if (decimalPart !== '') {
+                    input.value = formattedInteger + ',' + decimalPart;
+                } else if (value.endsWith(',')) {
+                    // Kullanıcı virgül yazmışsa ama henüz ondalık kısım yazmamışsa
+                    input.value = formattedInteger + ',';
+                } else {
+                    input.value = formattedInteger;
+                }
+            } else if (value === '') {
+                input.value = '';
             }
         }
         
