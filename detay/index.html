@@ -266,7 +266,7 @@
                 ctx.fillStyle = index === results.length - 1 ? '#059669' : '#1f2937';
                 ctx.font = index === results.length - 1 ? 'bold 18px Arial' : 'bold 16px Arial';
                 ctx.textAlign = 'right';
-                ctx.fillText(`${result.value.toFixed(2)} TL`, canvas.width - 40, yPos);
+                ctx.fillText(`${result.value.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL`, canvas.width - 40, yPos);
                 
                 yPos += 40;
             });
@@ -286,11 +286,11 @@
             const net = tip === "tuzel" ? brut - stopaj : brut;
             
             // Sonuçları güncelle
-            document.getElementById("brut").textContent = brut.toFixed(2) + " TL";
-            document.getElementById("kdv").textContent = kdv.toFixed(2) + " TL";
-            document.getElementById("stopaj").textContent = stopaj.toFixed(2) + " TL";
-            document.getElementById("tevkifat").textContent = tevkifat.toFixed(2) + " TL";
-            document.getElementById("net").textContent = net.toFixed(2) + " TL";
+            document.getElementById("brut").textContent = brut.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("kdv").textContent = kdv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("stopaj").textContent = stopaj.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("tevkifat").textContent = tevkifat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("net").textContent = net.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             
             // Sonuçları göster
             document.getElementById("results").style.display = "block";
@@ -319,11 +319,11 @@
             const net = tip === "tuzel" ? gercekBrut - stopaj : gercekBrut;
             
             // Sonuçları güncelle
-            document.getElementById("brut").textContent = gercekBrut.toFixed(2) + " TL";
-            document.getElementById("kdv").textContent = kdv.toFixed(2) + " TL";
-            document.getElementById("stopaj").textContent = stopaj.toFixed(2) + " TL";
-            document.getElementById("tevkifat").textContent = tevkifat.toFixed(2) + " TL";
-            document.getElementById("net").textContent = net.toFixed(2) + " TL";
+            document.getElementById("brut").textContent = gercekBrut.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("kdv").textContent = kdv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("stopaj").textContent = stopaj.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("tevkifat").textContent = tevkifat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("net").textContent = net.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
             
             // Sonuçları göster
             document.getElementById("results").style.display = "block";
