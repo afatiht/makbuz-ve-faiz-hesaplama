@@ -168,6 +168,29 @@
             <button class="btn-clear" onclick="temizle()">🧹 Formu Temizle</button>
         </div>
 
+        <div class="results" id="results" style="display: none;">
+            <div class="result-item">
+                <span class="result-label">💵 Brüt (KDV Hariç):</span>
+                <span class="result-value" id="brut">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">🏷️ KDV (%20):</span>
+                <span class="result-value" id="kdv">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">📉 Stopaj (%20):</span>
+                <span class="result-value" id="stopaj">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">⚖️ KDV Tevkifat (%50):</span>
+                <span class="result-value" id="tevkifat">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">💎 Alınan Net Ücret:</span>
+                <span class="result-value" id="net">-</span>
+            </div>
+        </div>
+
         <div class="canvas-container">
             <canvas id="calculatorCanvas" width="600" height="400"></canvas>
         </div>
@@ -263,6 +286,15 @@
             const tevkifat = toplam >= 9900 ? kdv * 0.50 : 0;
             const net = tip === "tuzel" ? brut - stopaj : brut;
             
+            // Sonuçları güncelle
+            document.getElementById("brut").textContent = brut.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("kdv").textContent = kdv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("stopaj").textContent = stopaj.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("tevkifat").textContent = tevkifat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("net").textContent = net.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            
+            // Sonuçları göster
+            document.getElementById("results").style.display = "block";
             
             // Canvas'ı güncelle
             drawResults({ brut, kdv, stopaj, tevkifat, net, tip });
@@ -287,6 +319,15 @@
             const tevkifat = toplam >= 9900 ? kdv * 0.50 : 0;
             const net = tip === "tuzel" ? gercekBrut - stopaj : gercekBrut;
             
+            // Sonuçları güncelle
+            document.getElementById("brut").textContent = gercekBrut.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("kdv").textContent = kdv.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("stopaj").textContent = stopaj.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("tevkifat").textContent = tevkifat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            document.getElementById("net").textContent = net.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+            
+            // Sonuçları göster
+            document.getElementById("results").style.display = "block";
             
             // Canvas'ı güncelle
             drawResults({ brut: gercekBrut, kdv, stopaj, tevkifat, net, tip });
@@ -295,6 +336,12 @@
         function temizle() {
             document.getElementById("toplam").value = "";
             document.getElementById("alinan").value = "";
+            document.getElementById("brut").textContent = "-";
+            document.getElementById("kdv").textContent = "-";
+            document.getElementById("stopaj").textContent = "-";
+            document.getElementById("tevkifat").textContent = "-";
+            document.getElementById("net").textContent = "-";
+            document.getElementById("results").style.display = "none";
             
             // Canvas'ı temizle
             drawInitialCanvas();
