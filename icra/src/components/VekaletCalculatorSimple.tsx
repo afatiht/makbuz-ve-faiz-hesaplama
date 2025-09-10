@@ -1,13 +1,5 @@
 import { useState } from "react";
 
-interface CalculationResult {
-  alacakTutari: number;
-  vekaletUcreti: number;
-  toplamTutar: number;
-  kesinlesmeOncesi: boolean;
-  hesaplamaDetaylari: string;
-}
-
 interface VekaletHesapResult {
   vekaletUcreti: number;
   kesinlesucreti: number;
@@ -146,68 +138,10 @@ const hesaplamaDilimDetaylari = (alacakTutari: number): string => {
 };
 
 export const VekaletCalculatorSimple = () => {
-  const [alacakTutari, setAlacakTutari] = useState<string>("");
-  const [kesinlesmeOncesi, setKesinlesmeOncesi] = useState<string>("oncesi");
-  const [sonuc, setSonuc] = useState<CalculationResult | null>(null);
-  
-  // Vekalet ücreti tersine hesaplama için state'ler
   const [vekaletTutari, setVekaletTutari] = useState<string>("");
   const [vekaletKesinlesme, setVekaletKesinlesme] = useState<string>("oncesi");
   const [vekaletSonuc, setVekaletSonuc] = useState<VekaletHesapResult | null>(null);
 
-  const hesapla = () => {
-    if (!alacakTutari) {
-      alert("Lütfen alacak tutarını girin.");
-      return;
-    }
-
-    const alacak = parseFloat(alacakTutari.replace(/[.,]/g, match => match === ',' ? '.' : ''));
-    
-    if (isNaN(alacak) || alacak <= 0) {
-      alert("Lütfen geçerli bir alacak tutarı girin.");
-      return;
-    }
-
-    const sureDahilinde = kesinlesmeOncesi === "oncesi";
-    
-    // 2025 Yılı Dilimli Vekalet Ücreti Hesaplama
-    const hesaplananVekaletUcreti = hesaplaVekaletUcreti(alacak);
-    const minimumVekaletUcreti = 6500; // 2025 yılı minimum maktu tutar (TL)
-    
-    // Minimum tutar kontrolü
-    let temelVekaletUcreti = Math.max(hesaplananVekaletUcreti, minimumVekaletUcreti);
-    
-    // 7 günlük süre kuralı uygulaması
-    let vekaletUcreti: number;
-    let hesaplamaDetaylari: string;
-    
-    if (sureDahilinde) {
-      // Kesinleşme öncesi ödeme - 3/4 oranı
-      vekaletUcreti = temelVekaletUcreti * 0.75;
-      hesaplamaDetaylari = `7 günlük süre içinde ödeme yapıldığı için vekalet ücretinin 3/4'ü (${(0.75 * 100).toFixed(0)}%) uygulanmıştır.`;
-    } else {
-      // Kesinleşme sonrası ödeme - tam tutar
-      vekaletUcreti = temelVekaletUcreti;
-      hesaplamaDetaylari = `7 günlük süre geçtikten sonra ödeme yapıldığı için vekalet ücretinin tamamı uygulanmıştır.`;
-    }
-
-    const toplamTutar = alacak + vekaletUcreti;
-
-    // Detaylı hesaplama açıklaması
-    const dilimDetaylari = hesaplamaDilimDetaylari(alacak);
-    const minimumKontrol = hesaplananVekaletUcreti < minimumVekaletUcreti ? 
-      ` Hesaplanan tutar minimum maktu tutardan (${minimumVekaletUcreti.toLocaleString('tr-TR')} TL) düşük olduğu için minimum tutar uygulandı.` : "";
-    
-    hesaplamaDetaylari += ` ${dilimDetaylari}${minimumKontrol}`;
-
-    setSonuc({
-      alacakTutari: alacak,
-      vekaletUcreti,
-      toplamTutar,
-      kesinlesmeOncesi: sureDahilinde,
-      hesaplamaDetaylari
-    });
-  };
 
   const hesaplaVekalet = () => {
     if (!vekaletTutari) {
@@ -244,12 +178,6 @@ export const VekaletCalculatorSimple = () => {
     });
   };
 
-  const temizle = () => {
-    setAlacakTutari("");
-    setKesinlesmeOncesi("oncesi");
-    setSonuc(null);
-  };
-
   const vekaletTemizle = () => {
     setVekaletTutari("");
     setVekaletKesinlesme("oncesi");
@@ -258,183 +186,6 @@ export const VekaletCalculatorSimple = () => {
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      {/* Ana Vekalet Ücreti Hesaplama */}
-      <div style={{ marginBottom: '40px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>
-            Alacak Tutarından Vekalet Ücreti Hesaplama
-          </h2>
-          <p style={{ color: '#6b7280' }}>Alacak tutarınızı girerek vekalet ücreti hesaplayın</p>
-        </div>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-          {/* Form */}
-          <div style={{ padding: '20px', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#ffffff' }}>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                Alacak Tutarı (TL)
-              </label>
-              <input
-                type="text"
-                placeholder="Örnek: 100.000"
-                value={alacakTutari}
-                onChange={(e) => setAlacakTutari(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Ödeme Zamanı</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <input
-                    type="radio"
-                    name="kesinlesme"
-                    value="oncesi"
-                    checked={kesinlesmeOncesi === "oncesi"}
-                    onChange={(e) => setKesinlesmeOncesi(e.target.value)}
-                    style={{ marginRight: '8px' }}
-                  />
-                  Kesinleşme öncesi (7 gün içinde)
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <input
-                    type="radio"
-                    name="kesinlesme"
-                    value="sonrasi"
-                    checked={kesinlesmeOncesi === "sonrasi"}
-                    onChange={(e) => setKesinlesmeOncesi(e.target.value)}
-                    style={{ marginRight: '8px' }}
-                  />
-                  Kesinleşme sonrası (7 gün sonra)
-                </label>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-              <button
-                onClick={hesapla}
-                style={{
-                  flex: 1,
-                  padding: '12px 24px',
-                  backgroundColor: '#2563eb',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '500'
-                }}
-              >
-                📊 Hesapla
-              </button>
-              <button
-                onClick={temizle}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#f3f4f6',
-                  color: '#374151',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '16px'
-                }}
-              >
-                Temizle
-              </button>
-            </div>
-          </div>
-
-          {/* Sonuç */}
-          <div>
-            {sonuc ? (
-              <div style={{ 
-                padding: '20px', 
-                border: '2px solid #2563eb', 
-                borderRadius: '8px', 
-                backgroundColor: '#f8fafc'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#2563eb', margin: 0 }}>Hesaplama Sonucu</h3>
-                  <span style={{ 
-                    padding: '4px 8px', 
-                    backgroundColor: sonuc.kesinlesmeOncesi ? '#2563eb' : '#6b7280', 
-                    color: 'white', 
-                    borderRadius: '4px', 
-                    fontSize: '12px' 
-                  }}>
-                    {sonuc.kesinlesmeOncesi ? "Kesinleşme Öncesi" : "Kesinleşme Sonrası"}
-                  </span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                  <div>
-                    <p style={{ color: '#6b7280', margin: '0 0 4px 0', fontSize: '14px' }}>Alacak Tutarı</p>
-                    <p style={{ fontWeight: 'bold', fontSize: '18px', margin: 0 }}>
-                      {sonuc.alacakTutari.toLocaleString('tr-TR', { 
-                        style: 'currency', 
-                        currency: 'TRY' 
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <p style={{ color: '#6b7280', margin: '0 0 4px 0', fontSize: '14px' }}>Vekalet Ücreti</p>
-                    <p style={{ fontWeight: 'bold', fontSize: '18px', color: '#2563eb', margin: 0 }}>
-                      {sonuc.vekaletUcreti.toLocaleString('tr-TR', { 
-                        style: 'currency', 
-                        currency: 'TRY' 
-                      })}
-                    </p>
-                  </div>
-                </div>
-
-                <hr style={{ margin: '16px 0', border: 'none', borderTop: '1px solid #e5e7eb' }} />
-
-                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                  <p style={{ color: '#6b7280', margin: '0 0 4px 0', fontSize: '14px' }}>Toplam Tutar</p>
-                  <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#2563eb', margin: 0 }}>
-                    {sonuc.toplamTutar.toLocaleString('tr-TR', { 
-                      style: 'currency', 
-                      currency: 'TRY' 
-                    })}
-                  </p>
-                </div>
-
-                <hr style={{ margin: '16px 0', border: 'none', borderTop: '1px solid #e5e7eb' }} />
-
-                <div>
-                  <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Hesaplama Detayları:</p>
-                  <p style={{ fontSize: '13px', color: '#6b7280', lineHeight: '1.5', margin: 0 }}>
-                    {sonuc.hesaplamaDetaylari}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div style={{ 
-                padding: '40px', 
-                border: '2px dashed #d1d5db', 
-                borderRadius: '8px', 
-                textAlign: 'center',
-                color: '#6b7280'
-              }}>
-                <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
-                <p>Hesaplama yapmak için formu doldurun</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <hr style={{ margin: '40px 0', border: 'none', borderTop: '2px solid #e5e7eb' }} />
-
-      {/* Vekalet Ücreti Tersine Hesaplama */}
       <div>
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>
