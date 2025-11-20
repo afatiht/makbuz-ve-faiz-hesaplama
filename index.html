@@ -264,7 +264,7 @@
 
 <body>
     <div class="container">
-        <header><button id="settings-btn" class="settings-btn" title="Ayarlar">⚙️</button>
+        <header>
             <h1>Serbest Meslek Makbuzu Hesaplama Aracı</h1>
             <p>Avukatlar için pratik hesaplama çözümü</p>
         </header>
@@ -358,46 +358,35 @@
             </div>
         </div>
     </div>
-    < !-- Settings Modal -->
-        <div id="settings-modal" class="modal">
-            <div class="modal-content"><span class="close-modal" id="close-settings">&times;
-                </span>
-                <h2>Ayarlar</h2>
-                <div class="form-group"><label for="tcmb-api-key">TCMB EVDS API Anahtarı</label><input type="text"
-                        id="tcmb-api-key" placeholder="API Anahtarınızı giriniz"><small>Anahtar almak için <a
-                            href="https://evds2.tcmb.gov.tr/" target="_blank">TCMB EVDS</a>sitesine kayıt
-                        olunuz.</small></div><button id="save-settings">Kaydet</button>
-            </div>
-        </div>
-        < !-- Rates Modal -->
-            <div id="rates-modal" class="modal">
-                <div class="modal-content"><span class="close-modal" id="close-rates">&times;
+    < !-- Rates Modal -->
+        <div id="rates-modal" class="modal">
+            <div class="modal-content"><span class="close-modal" id="close-rates">&times;
 
-                    </span>
-                    <h2>Güncel Faiz Oranları</h2>
-                    <div id="rates-list">
-                        <p>Yükleniyor...</p>
-                    </div>
+                </span>
+                <h2>Güncel Faiz Oranları</h2>
+                <div id="rates-list">
+                    <p>Yükleniyor...</p>
                 </div>
             </div>
-            <script src="utils.js"></script>
-            <script src="tcmb-service.js"></script>
-            <script src="date-utils.js"></script>
-            <script src="input-mask.js"></script>
-            <script src="makbuz.js"></script>
-            <script src="faiz.js"></script>
-            <script>if ('serviceWorker' in navigator) {
-                    window.addEventListener('load', () => {
-                        navigator.serviceWorker.register('./sw.js').then(registration => {
-                            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        </div>
+        <script src="utils.js"></script>
+        <script src="tcmb-service.js"></script>
+        <script src="date-utils.js"></script>
+        <script src="input-mask.js"></script>
+        <script src="makbuz.js"></script>
+        <script src="faiz.js"></script>
+        <script>if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js').then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
 
-                        }).catch(err => {
-                            console.log('ServiceWorker registration failed: ', err);
-                        });
+                    }).catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
                     });
-                }
+                });
+            }
 
-            </script>
+        </script>
 </body>
 
 </html>

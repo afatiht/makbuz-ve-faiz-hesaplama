@@ -134,43 +134,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('bitis-tarihi').value = todayFormatted;
 
     // TCMB Integration
-    const settingsBtn = document.getElementById('settings-btn');
-    const settingsModal = document.getElementById('settings-modal');
-    const closeSettings = document.getElementById('close-settings');
-    const saveSettingsBtn = document.getElementById('save-settings');
-    const tcmbApiKeyInput = document.getElementById('tcmb-api-key');
-
     const getRatesBtn = document.getElementById('get-rates-btn');
     const ratesModal = document.getElementById('rates-modal');
     const closeRates = document.getElementById('close-rates');
     const ratesList = document.getElementById('rates-list');
 
-    // Settings Modal
-    settingsBtn.addEventListener('click', () => {
-        tcmbApiKeyInput.value = TCMBService.getApiKey() || '';
-        settingsModal.style.display = 'block';
-    });
-
-    closeSettings.addEventListener('click', () => {
-        settingsModal.style.display = 'none';
-    });
-
-    saveSettingsBtn.addEventListener('click', () => {
-        const key = tcmbApiKeyInput.value.trim();
-        if (key) {
-            TCMBService.saveApiKey(key);
-            alert('API Anahtarı kaydedildi.');
-            settingsModal.style.display = 'none';
-        } else {
-            alert('Lütfen geçerli bir API anahtarı giriniz.');
-        }
-    });
-
     // Close modals when clicking outside
     window.addEventListener('click', (event) => {
-        if (event.target == settingsModal) {
-            settingsModal.style.display = 'none';
-        }
         if (event.target == ratesModal) {
             ratesModal.style.display = 'none';
         }
@@ -178,13 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Get Rates
     getRatesBtn.addEventListener('click', async () => {
-        const key = TCMBService.getApiKey();
-        if (!key) {
-            alert('Lütfen önce Ayarlar menüsünden TCMB API anahtarınızı giriniz.');
-            settingsBtn.click();
-            return;
-        }
-
+        // Key is now hardcoded in service, no need to check here
         ratesModal.style.display = 'block';
         ratesList.innerHTML = '<p>Veriler çekiliyor, lütfen bekleyiniz...</p>';
 

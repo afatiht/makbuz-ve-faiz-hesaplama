@@ -8,16 +8,8 @@ const TCMBService = {
     PROXY_URL: 'https://corsproxy.io/?',
 
     /**
-     * Saves the API key to local storage.
-     * @param {string} key - The API key.
-     */
-    saveApiKey: (key) => {
-        localStorage.setItem('tcmb_api_key', key);
-    },
-
-    /**
-     * Retrieves the API key from local storage.
-     * @returns {string|null} - The API key or null if not found.
+     * Retrieves the API key.
+     * @returns {string} - The API key.
      */
     getApiKey: () => {
         return 'C1lU3HUclC';
