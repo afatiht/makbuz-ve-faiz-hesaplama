@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3f51b5">
+    <link rel="manifest" href="manifest.json">
     <title>Serbest Meslek Makbuzu Hesaplama Aracı</title>
     <style>
         :root {
@@ -83,7 +86,8 @@
             font-weight: 600;
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -167,12 +171,15 @@
                 padding: 15px;
             }
 
-            input, select, button {
+            input,
+            select,
+            button {
                 padding: 10px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -272,13 +279,13 @@
                 <form id="faiz-form">
                     <div class="form-group">
                         <label for="anapara">Anapara (TL)</label>
-                        <input type="number" id="anapara" placeholder="Anapara tutarını giriniz" step="0.01" required>
+                        <input type="text" id="anapara" placeholder="Anapara tutarını giriniz" required>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="faiz-orani">Faiz Oranı (%)</label>
-                            <input type="number" id="faiz-orani" placeholder="Yıllık faiz oranını giriniz" step="0.01" required>
+                            <input type="text" id="faiz-orani" placeholder="Yıllık faiz oranını giriniz" required>
                         </div>
 
                         <div class="form-group">
@@ -340,7 +347,24 @@
         </div>
     </div>
 
+    <script src="utils.js"></script>
+    <script src="date-utils.js"></script>
+    <script src="input-mask.js"></script>
     <script src="makbuz.js"></script>
     <script src="faiz.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
 </body>
+
 </html>
