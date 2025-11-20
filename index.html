@@ -176,195 +176,228 @@
             button {
                 padding: 10px;
             }
+
+            input,
+            select,
+            button {
+                padding: 10px;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close-modal:hover {
+            color: #000;
+        }
+
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--primary-color);
+            width: auto;
+            padding: 5px;
+        }
+
+        .rate-list-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .rate-list-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .input-group-append {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group-append input {
+            flex: 1;
+        }
+
+        .input-group-append button {
+            width: auto;
+            white-space: nowrap;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <header>
+        <header><button id="settings-btn" class="settings-btn" title="Ayarlar">⚙️</button>
             <h1>Serbest Meslek Makbuzu Hesaplama Aracı</h1>
             <p>Avukatlar için pratik hesaplama çözümü</p>
         </header>
-
         <div class="tabs">
             <div class="tab active" id="tab-makbuz">Makbuz Hesaplama</div>
             <div class="tab" id="tab-faiz">Faiz Hesaplama</div>
         </div>
-
         <div id="makbuz-content">
             <div class="card">
                 <h2>Serbest Meslek Makbuzu Hesaplama</h2>
                 <form id="makbuz-form">
-                    <div class="form-group">
-                        <label for="tutar">KDV ve Stopaj Dahil Toplam Tutar (TL)</label>
-                        <input type="text" id="tutar" placeholder="Toplam tutarı giriniz" required>
-                    </div>
-
+                    <div class="form-group"><label for="tutar">KDV ve Stopaj Dahil Toplam Tutar (TL)</label><input
+                            type="text" id="tutar" placeholder="Toplam tutarı giriniz" required></div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="kdv-orani">KDV Oranı</label>
-                            <select id="kdv-orani">
+                        <div class="form-group"><label for="kdv-orani">KDV Oranı</label><select id="kdv-orani">
                                 <option value="0.20">%20 (Genel)</option>
                                 <option value="0.10">%10 (Çocuk Mahkemeleri)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="stopaj-orani">Stopaj Oranı</label>
-                            <select id="stopaj-orani">
+                            </select></div>
+                        <div class="form-group"><label for="stopaj-orani">Stopaj Oranı</label><select id="stopaj-orani">
                                 <option value="0.20">%20</option>
                                 <option value="0">%0 (Stopaj Yok)</option>
-                            </select>
-                        </div>
+                            </select></div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="tevkifat">Tevkifat Uygula</label>
-                        <select id="tevkifat">
+                    <div class="form-group"><label for="tevkifat">Tevkifat Uygula</label><select id="tevkifat">
                             <option value="otomatik">Otomatik (9.900 TL üzeri için)</option>
                             <option value="evet">Evet (Manuel)</option>
                             <option value="hayir">Hayır</option>
-                        </select>
-                    </div>
-
-                    <button type="submit">Hesapla</button>
+                        </select></div><button type="submit">Hesapla</button>
                 </form>
-
                 <div class="result" id="makbuz-result" style="display: none;">
                     <h3>Hesaplama Sonuçları</h3>
-                    <div class="result-item">
-                        <span>Brüt Tutar:</span>
-                        <span id="result-brut">0.00 TL</span>
+                    <div class="result-item"><span>Brüt Tutar:</span><span id="result-brut">0.00 TL</span></div>
+                    <div class="result-item"><span>KDV Tutarı:</span><span id="result-kdv">0.00 TL</span></div>
+                    <div class="result-item"><span>Tevkifat Tutarı:</span><span id="result-tevkifat">0.00 TL</span>
                     </div>
-                    <div class="result-item">
-                        <span>KDV Tutarı:</span>
-                        <span id="result-kdv">0.00 TL</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Tevkifat Tutarı:</span>
-                        <span id="result-tevkifat">0.00 TL</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Tahsil Edilecek KDV:</span>
-                        <span id="result-tahsil-kdv">0.00 TL</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Stopaj Tutarı:</span>
-                        <span id="result-stopaj">0.00 TL</span>
-                    </div>
-                    <div class="result-item">
-                        <span>KDV Dahil Toplam:</span>
-                        <span id="result-toplam">0.00 TL</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Net Tahsilat:</span>
-                        <span id="result-net">0.00 TL</span>
-                    </div>
+                    <div class="result-item"><span>Tahsil Edilecek KDV:</span><span id="result-tahsil-kdv">0.00
+                            TL</span></div>
+                    <div class="result-item"><span>Stopaj Tutarı:</span><span id="result-stopaj">0.00 TL</span></div>
+                    <div class="result-item"><span>KDV Dahil Toplam:</span><span id="result-toplam">0.00 TL</span></div>
+                    <div class="result-item"><span>Net Tahsilat:</span><span id="result-net">0.00 TL</span></div>
                 </div>
             </div>
-
             <div class="card history">
                 <h2>Hesaplama Geçmişi</h2>
                 <div id="makbuz-history">
-                    <!-- Geçmiş hesaplamalar burada listelenecek -->
-                    <p>Henüz hesaplama yapılmadı.</p>
+                    < !-- Geçmiş hesaplamalar burada listelenecek -->
+                        <p>Henüz hesaplama yapılmadı.</p>
                 </div>
             </div>
         </div>
-
         <div id="faiz-content" style="display: none;">
             <div class="card">
                 <h2>Faiz Hesaplama</h2>
                 <form id="faiz-form">
-                    <div class="form-group">
-                        <label for="anapara">Anapara (TL)</label>
-                        <input type="text" id="anapara" placeholder="Anapara tutarını giriniz" required>
-                    </div>
-
+                    <div class="form-group"><label for="anapara">Anapara (TL)</label><input type="text" id="anapara"
+                            placeholder="Anapara tutarını giriniz" required></div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="faiz-orani">Faiz Oranı (%)</label>
-                            <input type="text" id="faiz-orani" placeholder="Yıllık faiz oranını giriniz" required>
+                        <div class="form-group"><label for="faiz-orani">Faiz Oranı (%)</label>
+                            <div class="input-group-append"><input type="text" id="faiz-orani"
+                                    placeholder="Yıllık faiz oranını giriniz" required><button type="button"
+                                    id="get-rates-btn" title="TCMB'den Getir">🏦 TCMB</button></div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="faiz-turu">Faiz Türü</label>
-                            <select id="faiz-turu">
+                        <div class="form-group"><label for="faiz-turu">Faiz Türü</label><select id="faiz-turu">
                                 <option value="basit">Basit Faiz</option>
                                 <option value="temerrut">Temerrüt Faizi</option>
-                            </select>
-                        </div>
+                            </select></div>
                     </div>
-
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="baslangic-tarihi">Başlangıç Tarihi</label>
-                            <input type="date" id="baslangic-tarihi" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="bitis-tarihi">Bitiş Tarihi</label>
-                            <input type="date" id="bitis-tarihi" required>
-                        </div>
-                    </div>
-
-                    <button type="submit">Hesapla</button>
+                        <div class="form-group"><label for="baslangic-tarihi">Başlangıç Tarihi</label><input type="date"
+                                id="baslangic-tarihi" required></div>
+                        <div class="form-group"><label for="bitis-tarihi">Bitiş Tarihi</label><input type="date"
+                                id="bitis-tarihi" required></div>
+                    </div><button type="submit">Hesapla</button>
                 </form>
-
                 <div class="result" id="faiz-result" style="display: none;">
                     <h3>Hesaplama Sonuçları</h3>
-                    <div class="result-item">
-                        <span>Anapara:</span>
-                        <span id="result-anapara">0.00 TL</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Faiz Oranı:</span>
-                        <span id="result-oran">%0.00</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Gün Sayısı:</span>
-                        <span id="result-gun">0</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Faiz Tutarı:</span>
-                        <span id="result-faiz">0.00 TL</span>
-                    </div>
-                    <div class="result-item">
-                        <span>Toplam Tutar:</span>
-                        <span id="result-faiz-toplam">0.00 TL</span>
+                    <div class="result-item"><span>Anapara:</span><span id="result-anapara">0.00 TL</span></div>
+                    <div class="result-item"><span>Faiz Oranı:</span><span id="result-oran">%0.00</span></div>
+                    <div class="result-item"><span>Gün Sayısı:</span><span id="result-gun">0</span></div>
+                    <div class="result-item"><span>Faiz Tutarı:</span><span id="result-faiz">0.00 TL</span></div>
+                    <div class="result-item"><span>Toplam Tutar:</span><span id="result-faiz-toplam">0.00 TL</span>
                     </div>
                 </div>
             </div>
-
             <div class="card history">
                 <h2>Hesaplama Geçmişi</h2>
                 <div id="faiz-history">
-                    <!-- Geçmiş hesaplamalar burada listelenecek -->
-                    <p>Henüz hesaplama yapılmadı.</p>
+                    < !-- Geçmiş hesaplamalar burada listelenecek -->
+                        <p>Henüz hesaplama yapılmadı.</p>
                 </div>
             </div>
         </div>
     </div>
+    < !-- Settings Modal -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content"><span class="close-modal" id="close-settings">&times;
+                </span>
+                <h2>Ayarlar</h2>
+                <div class="form-group"><label for="tcmb-api-key">TCMB EVDS API Anahtarı</label><input type="text"
+                        id="tcmb-api-key" placeholder="API Anahtarınızı giriniz"><small>Anahtar almak için <a
+                            href="https://evds2.tcmb.gov.tr/" target="_blank">TCMB EVDS</a>sitesine kayıt
+                        olunuz.</small></div><button id="save-settings">Kaydet</button>
+            </div>
+        </div>
+        < !-- Rates Modal -->
+            <div id="rates-modal" class="modal">
+                <div class="modal-content"><span class="close-modal" id="close-rates">&times;
 
-    <script src="utils.js"></script>
-    <script src="date-utils.js"></script>
-    <script src="input-mask.js"></script>
-    <script src="makbuz.js"></script>
-    <script src="faiz.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
+                    </span>
+                    <h2>Güncel Faiz Oranları</h2>
+                    <div id="rates-list">
+                        <p>Yükleniyor...</p>
+                    </div>
+                </div>
+            </div>
+            <script src="utils.js"></script>
+            <script src="tcmb-service.js"></script>
+            <script src="date-utils.js"></script>
+            <script src="input-mask.js"></script>
+            <script src="makbuz.js"></script>
+            <script src="faiz.js"></script>
+            <script>if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('./sw.js').then(registration => {
+                            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+
+                        }).catch(err => {
+                            console.log('ServiceWorker registration failed: ', err);
+                        });
                     });
-            });
-        }
-    </script>
+                }
+
+            </script>
 </body>
 
 </html>
