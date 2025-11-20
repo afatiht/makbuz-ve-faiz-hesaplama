@@ -36,28 +36,21 @@ const TCMBService = {
             throw new Error('API Key not found. Please configure it in settings.');
         }
 
-        // Target URL with Key in query params (safest for proxies)
-        const targetUrl = `${TCMBService.API_URL}/series=${seriesCode}&startDate=${startDate}&endDate=${endDate}&type=json&key=${key}`;
+        // Target URL (without key, as we will send it in header where possible)
+        const targetUrl = `${TCMBService.API_URL}/series=${seriesCode}&startDate=${startDate}&endDate=${endDate}&type=json`;
 
-        // List of proxies to try in order
+        // List of proxies to try
+        // Note: We prioritize proxies that allow header forwarding because TCMB requires Key in Header.
         const proxies = [
             {
-                name: 'AllOrigins',
-                url: (target) => `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`,
-                parser: (data) => {
-                    if (!data.contents) throw new Error('No content from AllOrigins');
-                    return JSON.parse(data.contents);
-                }
+                name: 'CorsProxy.io',
+                url: (target) => `https://corsproxy.io/?${target}`, // Appends target directly
+                headers: { 'key': key }
             },
             {
-                name: 'CodeTabs',
-                url: (target) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`,
-                parser: (data) => data // CodeTabs returns JSON directly
-            },
-            {
-                name: 'CorsProxy',
-                url: (target) => `https://corsproxy.io/?${encodeURIComponent(target)}`,
-                parser: (data) => data
+                name: 'ThingProxy',
+                url: (target) => `https://thingproxy.freeboard.io/fetch/${target}`,
+                headers: { 'key': key }
             }
         ];
 
@@ -68,32 +61,53 @@ const TCMBService = {
                 console.log(`Trying proxy: ${proxy.name}`);
                 const proxyUrl = proxy.url(targetUrl);
 
-                const response = await fetch(proxyUrl);
+                const response = await fetch(proxyUrl, {
+                    method: 'GET',
+                    headers: {
+                        ...proxy.headers,
+                        'Accept': 'application/json'
+                    }
+                });
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status} from ${proxy.name}`);
                 }
 
-                const rawData = await response.json();
-                const data = proxy.parser(rawData);
+                const data = await response.json();
 
-                // Check if EVDS returned an internal error (sometimes returns 200 OK but with error message)
+                // Check for EVDS internal error
                 if (data.totalCount === 0 && !data.items) {
-                    // This might be valid empty data, or an error. 
-                    // EVDS usually returns 'items' array.
+                    // Empty response
                 }
 
-                return data; // Success!
+                return data;
 
             } catch (error) {
                 console.warn(`Proxy ${proxy.name} failed:`, error);
                 lastError = error;
-                // Continue to next proxy
             }
         }
 
-        // If all proxies failed
-        throw new Error(`All proxies failed. Last error: ${lastError.message}`);
+        throw new Error(`All proxies failed. Last error: ${lastError ? lastError.message : 'Unknown'}`);
+    },
+
+    /**
+     * Returns static interest rates that are not easily available via EVDS series.
+     * @returns {Array} - List of static rates.
+     */
+    getStaticRates: () => {
+        return [
+            {
+                name: 'Yasal Faiz (21.05.2024 sonrası)',
+                value: 24.00,
+                date: 'Sabit Oran'
+            },
+            {
+                name: 'Kamu Alacakları Gecikme Zammı (Yıllık)',
+                value: 54.00, // %4.5 monthly * 12
+                date: 'Sabit Oran (Aylık %4.5)'
+            }
+        ];
     },
 
     /**
@@ -101,6 +115,8 @@ const TCMBService = {
      * @returns {Promise<Array>} - List of interest rates.
      */
     getCommonRates: async () => {
+        const rates = [...TCMBService.getStaticRates()];
+
         const today = new Date();
         const oneMonthAgo = new Date();
         oneMonthAgo.setMonth(today.getMonth() - 1);
@@ -124,40 +140,38 @@ const TCMBService = {
         try {
             const data = await TCMBService.fetchData(seriesCodes, startDate, endDate);
 
-            if (!data.items || data.items.length === 0) {
-                return [];
-            }
+            if (data.items && data.items.length > 0) {
+                // Get the latest item
+                const latestItem = data.items[data.items.length - 1];
 
-            // Get the latest item
-            const latestItem = data.items[data.items.length - 1];
-
-            const rates = [];
-
-            if (latestItem['TP_KTF10']) {
-                rates.push({
-                    name: 'TCMB Politika Faizi (1 Hafta Repo)',
-                    value: parseFloat(latestItem['TP_KTF10']),
-                    date: latestItem['Tarih']
-                });
+                if (latestItem['TP_KTF10']) {
+                    rates.push({
+                        name: 'TCMB Politika Faizi (1 Hafta Repo)',
+                        value: parseFloat(latestItem['TP_KTF10']),
+                        date: latestItem['Tarih']
+                    });
+                }
+                if (latestItem['TP_AVANS_YILLIK']) {
+                    rates.push({
+                        name: 'Avans Faizi (Ticari Temerrüt)',
+                        value: parseFloat(latestItem['TP_AVANS_YILLIK']),
+                        date: latestItem['Tarih']
+                    });
+                }
+                if (latestItem['TP_REESKONT_YILLIK']) {
+                    rates.push({
+                        name: 'Reeskont Faizi',
+                        value: parseFloat(latestItem['TP_REESKONT_YILLIK']),
+                        date: latestItem['Tarih']
+                    });
+                }
             }
-            if (latestItem['TP_AVANS_YILLIK']) {
-                rates.push({
-                    name: 'Avans Faizi',
-                    value: parseFloat(latestItem['TP_AVANS_YILLIK']),
-                    date: latestItem['Tarih']
-                });
-            }
-            if (latestItem['TP_REESKONT_YILLIK']) {
-                rates.push({
-                    name: 'Reeskont Faizi',
-                    value: parseFloat(latestItem['TP_REESKONT_YILLIK']),
-                    date: latestItem['Tarih']
-                });
-            }
-
-            return rates;
         } catch (error) {
-            throw error;
+            console.error('Failed to fetch dynamic rates:', error);
+            // We suppress the error here to at least show the static rates
+            // But we might want to notify the user via a UI indicator
         }
+
+        return rates;
     }
 };
