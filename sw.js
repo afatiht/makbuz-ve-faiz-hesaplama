@@ -1,4 +1,5 @@
-const CACHE_NAME = 'makbuz-faiz-v1';
+const CACHE_NAME = 'makbuz-faiz-v2'; // Versiyon güncellendi
+
 const ASSETS = [
     './',
     './index.html',
@@ -7,6 +8,7 @@ const ASSETS = [
     './input-mask.js',
     './makbuz.js',
     './faiz.js',
+    './tcmb-service.js',
     './manifest.json',
     './icon-192.png',
     './icon-512.png'

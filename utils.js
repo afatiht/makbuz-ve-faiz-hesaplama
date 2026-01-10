@@ -53,20 +53,14 @@ const Utils = {
 
     /**
      * Calculates the difference in days between two dates.
+     * @deprecated Use DateUtils.calculateDayDifference instead.
      * @param {Date} date1 - First date.
      * @param {Date} date2 - Second date.
      * @returns {number} - Difference in days (absolute value).
      */
     calculateDayDifference: (date1, date2) => {
-        const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
-        // Reset time parts to ensure we count full days
-        const d1 = new Date(date1);
-        d1.setHours(0, 0, 0, 0);
-        const d2 = new Date(date2);
-        d2.setHours(0, 0, 0, 0);
-
-        const diffDays = Math.round(Math.abs((d1 - d2) / oneDay));
-        return diffDays;
+        console.warn('Utils.calculateDayDifference is deprecated. Use DateUtils.calculateDayDifference instead.');
+        return DateUtils.calculateDayDifference(date1, date2);
     },
 
     /**

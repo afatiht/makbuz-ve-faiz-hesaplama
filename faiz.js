@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             // Form değerlerini al
             const anapara = Utils.parseCurrency(anaparaInput.value);
-            const faizOrani = Utils.parseCurrency(faizOraniInput.value);
+            let faizOrani = Utils.parseCurrency(faizOraniInput.value);
             const faizTuru = document.getElementById('faiz-turu').value;
             const baslangicTarihi = new Date(document.getElementById('baslangic-tarihi').value);
             const bitisTarihi = new Date(document.getElementById('bitis-tarihi').value);
@@ -37,13 +37,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            // Faiz tutarını hesapla
-            const faizTutari = anapara * (faizOrani / 100) * (gunFarki / 365);
+            // Faiz türüne göre hesaplama
+            let faizTutari;
+            let kullanilacakOran = faizOrani;
+
+            if (faizTuru === 'temerrut') {
+                // Temerrüt faizi: Ticari işlerde avans faiz oranı uygulanır
+                // Eğer kullanıcı oran girmediyse veya düşük girdiyse varsayılan avans faizi kullan
+                // Güncel avans faizi oranı (2024-2025): %55
+                const VARSAYILAN_TEMERRUT_ORANI = 55; // Avans faiz oranı
+
+                if (faizOrani === 0 || faizOrani < VARSAYILAN_TEMERRUT_ORANI) {
+                    kullanilacakOran = VARSAYILAN_TEMERRUT_ORANI;
+                    faizOraniInput.value = Utils.formatNumber(VARSAYILAN_TEMERRUT_ORANI);
+                }
+
+                // Temerrüt faizi formülü (basit faiz ile aynı formül, fark oran seçiminde)
+                faizTutari = anapara * (kullanilacakOran / 100) * (gunFarki / 365);
+            } else {
+                // Basit faiz hesaplama
+                // Formül: Faiz = Anapara × (Oran / 100) × (Gün / 365)
+                faizTutari = anapara * (faizOrani / 100) * (gunFarki / 365);
+                kullanilacakOran = faizOrani;
+            }
+
             const toplamTutar = anapara + faizTutari;
 
             // Sonuçları göster
             document.getElementById('result-anapara').textContent = Utils.formatCurrency(anapara);
-            document.getElementById('result-oran').textContent = `%${faizOrani.toFixed(2)}`;
+            document.getElementById('result-oran').textContent = `%${kullanilacakOran.toFixed(2)}`;
             document.getElementById('result-gun').textContent = gunFarki;
             document.getElementById('result-faiz').textContent = Utils.formatCurrency(faizTutari);
             document.getElementById('result-faiz-toplam').textContent = Utils.formatCurrency(toplamTutar);
@@ -54,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const hesaplama = {
                 tarih: new Date().toLocaleString('tr-TR'),
                 anapara: anapara,
-                faizOrani: faizOrani,
+                faizOrani: kullanilacakOran,
                 faizTuru: faizTuru === 'basit' ? 'Basit Faiz' : 'Temerrüt Faizi',
                 baslangicTarihi: baslangicTarihi.toLocaleDateString('tr-TR'),
                 bitisTarihi: bitisTarihi.toLocaleDateString('tr-TR'),
