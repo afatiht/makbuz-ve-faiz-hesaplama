@@ -283,7 +283,7 @@
                             </select></div>
                     </div>
                     <div class="form-group"><label for="tevkifat">Tevkifat Uygula</label><select id="tevkifat">
-                            <option value="otomatik">Otomatik (9.900 TL üzeri için)</option>
+                            <option value="otomatik">Otomatik (12.000 TL ve üzeri için)</option>
                             <option value="evet">Evet (Manuel)</option>
                             <option value="hayir">Hayır</option>
                         </select></div><button type="submit">Hesapla</button>
@@ -305,7 +305,7 @@
                 <h2>Hesaplama Geçmişi</h2>
                 <div id="makbuz-history">
                     <!-- Geçmiş hesaplamalar burada listelenecek -->
-                <p>Henüz hesaplama yapılmadı.</p>
+                    <p>Henüz hesaplama yapılmadı.</p>
                 </div>
             </div>
         </div>
@@ -347,29 +347,29 @@
                 <h2>Hesaplama Geçmişi</h2>
                 <div id="faiz-history">
                     <!-- Geçmiş hesaplamalar burada listelenecek -->
-                <p>Henüz hesaplama yapılmadı.</p>
+                    <p>Henüz hesaplama yapılmadı.</p>
                 </div>
             </div>
         </div>
     </div>
     <!-- Rates Modal -->
     <div id="rates-modal" class="modal">
-            <div class="modal-content"><span class="close-modal" id="close-rates">&times;
+        <div class="modal-content"><span class="close-modal" id="close-rates">&times;
 
-                </span>
-                <h2>Güncel Faiz Oranları</h2>
-                <div id="rates-list">
-                    <p>Yükleniyor...</p>
-                </div>
+            </span>
+            <h2>Güncel Faiz Oranları</h2>
+            <div id="rates-list">
+                <p>Yükleniyor...</p>
             </div>
         </div>
-        <script src="utils.js"></script>
-        <script src="tcmb-service.js"></script>
-        <script src="date-utils.js"></script>
-        <script src="input-mask.js"></script>
-        <script src="makbuz.js"></script>
-        <script src="faiz.js"></script>
-        <script>if ('serviceWorker' in navigator) {
+    </div>
+    <script src="utils.js"></script>
+    <script src="tcmb-service.js"></script>
+    <script src="date-utils.js"></script>
+    <script src="input-mask.js"></script>
+    <script src="makbuz.js"></script>
+    <script src="faiz.js"></script>
+    <script>if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('./sw.js').then(registration => {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
@@ -380,7 +380,7 @@
                 });
             }
 
-        </script>
+    </script>
 </body>
 
 </html>

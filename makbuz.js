@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let tevkifatOrani = 0;
             if (tevkifatSecim === 'evet') {
                 tevkifatOrani = 0.5; // 5/10
-            } else if (tevkifatSecim === 'otomatik' && kdvDahilToplam > 9900) {
+            } else if (tevkifatSecim === 'otomatik' && kdvDahilToplam >= 12000) {
                 tevkifatOrani = 0.5; // 5/10
             }
 

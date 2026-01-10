@@ -33,7 +33,7 @@ Uygulama iki ana bölümden oluşmaktadır:
 
 ### Adım 4: Tevkifat Seçeneğini Belirleyin
 - Tevkifat uygulaması için seçenek belirleyin:
-  - **Otomatik (9.900 TL üzeri için)**: KDV dahil tutar 9.900 TL'yi aştığında otomatik olarak tevkifat uygular
+  - **Otomatik (12.000 TL ve üzeri için)**: KDV dahil tutar 12.000 TL ve üzerinde olduğunda otomatik olarak tevkifat uygular
   - **Evet (Manuel)**: Tutardan bağımsız olarak tevkifat uygular
   - **Hayır**: Tevkifat uygulamaz
 
@@ -92,8 +92,8 @@ Hesaplama sonucunda şu bilgiler görüntülenir:
 
 
 ### Tevkifat (KDV Kesintisi)
-- KDV dahil 9.900 TL'yi aşan hizmetler için: %50 (5/10) oranında tevkifat uygulanır
-- KDV dahil 9.900 TL altındaki hizmetler için: Tevkifat uygulanmaz
+- KDV dahil 12.000 TL ve üzeri hizmetler için: %50 (5/10) oranında tevkifat uygulanır
+- KDV dahil 12.000 TL altındaki hizmetler için: Tevkifat uygulanmaz
 
 ### Stopaj (Gelir Vergisi Kesintisi)
 - Stopaj oranı: %20

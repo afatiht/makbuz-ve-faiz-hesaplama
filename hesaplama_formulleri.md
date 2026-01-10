@@ -11,7 +11,7 @@
 - %10 KDV oranı için: Brüt Tutar = KDV Dahil Tutar ÷ 1.10
 - KDV Tutarı = KDV Dahil Tutar - Brüt Tutar
 
-### Tevkifat Hesaplama (KDV dahil 9.900 TL üzeri hizmetler için)
+### Tevkifat Hesaplama (KDV dahil 12.000 TL ve üzeri hizmetler için)
 - Tevkifat Oranı = 5/10 (%50)
 - Tevkifat Tutarı = KDV Tutarı × Tevkifat Oranı
 - Tahsil Edilecek KDV = KDV Tutarı - Tevkifat Tutarı
