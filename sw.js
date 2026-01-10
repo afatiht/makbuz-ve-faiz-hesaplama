@@ -1,4 +1,4 @@
-const CACHE_NAME = 'makbuz-faiz-v2'; // Versiyon güncellendi
+const CACHE_NAME = 'makbuz-faiz-v3'; // Versiyon güncellendi
 
 const ASSETS = [
     './',
