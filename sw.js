@@ -1,4 +1,4 @@
-const CACHE_NAME = 'makbuz-faiz-v4'; // Versiyon güncellendi
+const CACHE_NAME = 'makbuz-faiz-v5'; // Versiyon güncellendi
 
 const ASSETS = [
     './',
@@ -9,6 +9,7 @@ const ASSETS = [
     './makbuz.js',
     './faiz.js',
     './vekalet.js',
+    './icra-vekalet.js',
     './tcmb-service.js',
     './manifest.json',
     './icon-192.png',

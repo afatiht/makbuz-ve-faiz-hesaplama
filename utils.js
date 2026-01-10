@@ -75,5 +75,50 @@ const Utils = {
     setupCurrencyInput: (inputElement) => {
         console.warn('Utils.setupCurrencyInput is deprecated. Use InputMask.attach() instead.');
         // Legacy support or empty implementation if we fully switch
+    },
+    /**
+     * Escapes HTML special characters to prevent XSS.
+     * @param {string} str - String to escape.
+     * @returns {string} - Escaped string.
+     */
+    escapeHTML: (str) => {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    },
+    /**
+     * Copies text to clipboard.
+     * @param {string} text - Text to copy.
+     * @returns {Promise<boolean>} - Success status.
+     */
+    copyToClipboard: async (text) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+            return false;
+        }
+    },
+    /**
+     * Handles copy button click with visual feedback.
+     * @param {HTMLElement} btn - Button element.
+     * @param {string} text - Text to copy.
+     */
+    handleCopyClick: async (btn, text) => {
+        const success = await Utils.copyToClipboard(text);
+        if (success) {
+            const originalText = btn.textContent;
+            btn.textContent = 'Kopyalandı!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('copied');
+            }, 2000);
+        }
     }
 };

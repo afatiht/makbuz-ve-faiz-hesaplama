@@ -342,26 +342,38 @@ document.addEventListener('DOMContentLoaded', function () {
         sonuc.detaylar.forEach(d => {
             detayHtml += `
                 <div class="result-item">
-                    <span>${d.aciklama}</span>
-                    <span>${Utils.formatCurrency(d.ucret)}</span>
+                    <span>${Utils.escapeHTML(d.aciklama)}</span>
+                    <span>${Utils.escapeHTML(Utils.formatCurrency(d.ucret))}</span>
                 </div>
             `;
         });
 
+        const ucretTL = Utils.formatNumber(sonuc.ucret);
+        const kdvDahilTL = Utils.formatNumber(sonuc.ucret * 1.20);
+
         document.getElementById('vekalet-sonuc-icerik').innerHTML = `
             <div class="result-item">
                 <span>Dava Değeri:</span>
-                <span>${Utils.formatCurrency(sonuc.davaDegeri)}</span>
+                <div>
+                    <span>${Utils.escapeHTML(Utils.formatCurrency(sonuc.davaDegeri))}</span>
+                    <button class="copy-btn" onclick="Utils.handleCopyClick(this, '${Utils.formatNumber(sonuc.davaDegeri)}')">Kopyala</button>
+                </div>
             </div>
             <h4 style="margin: 15px 0 10px 0; color: #666;">Dilim Detayları</h4>
             ${detayHtml}
             <div class="result-item" style="margin-top: 15px; font-size: 18px;">
                 <span><strong>Asgari Vekalet Ücreti:</strong></span>
-                <span style="color: #059669;"><strong>${Utils.formatCurrency(sonuc.ucret)}</strong></span>
+                <div>
+                    <span style="color: #059669;"><strong>${Utils.escapeHTML(Utils.formatCurrency(sonuc.ucret))}</strong></span>
+                    <button class="copy-btn" onclick="Utils.handleCopyClick(this, '${ucretTL}')">Kopyala</button>
+                </div>
             </div>
             <div class="result-item">
                 <span>KDV Dahil (%20):</span>
-                <span>${Utils.formatCurrency(sonuc.ucret * 1.20)}</span>
+                <div>
+                    <span>${Utils.escapeHTML(Utils.formatCurrency(sonuc.ucret * 1.20))}</span>
+                    <button class="copy-btn" onclick="Utils.handleCopyClick(this, '${kdvDahilTL}')">Kopyala</button>
+                </div>
             </div>
         `;
         vekaletResult.style.display = 'block';
@@ -369,18 +381,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Maktu sonuç göster
     function gosterMaktuSonuc(sonuc) {
+        const ucretTL = Utils.formatNumber(sonuc.ucret);
+        const kdvDahilTL = Utils.formatNumber(sonuc.ucret * 1.20);
+
         document.getElementById('vekalet-sonuc-icerik').innerHTML = `
             <div class="result-item">
                 <span>Hizmet Türü:</span>
-                <span>${sonuc.ad}</span>
+                <span>${Utils.escapeHTML(sonuc.ad)}</span>
             </div>
             <div class="result-item" style="font-size: 18px;">
                 <span><strong>Asgari Vekalet Ücreti:</strong></span>
-                <span style="color: #059669;"><strong>${Utils.formatCurrency(sonuc.ucret)}</strong></span>
+                <div>
+                    <span style="color: #059669;"><strong>${Utils.escapeHTML(Utils.formatCurrency(sonuc.ucret))}</strong></span>
+                    <button class="copy-btn" onclick="Utils.handleCopyClick(this, '${ucretTL}')">Kopyala</button>
+                </div>
             </div>
             <div class="result-item">
                 <span>KDV Dahil (%20):</span>
-                <span>${Utils.formatCurrency(sonuc.ucret * 1.20)}</span>
+                <div>
+                    <span>${Utils.escapeHTML(Utils.formatCurrency(sonuc.ucret * 1.20))}</span>
+                    <button class="copy-btn" onclick="Utils.handleCopyClick(this, '${kdvDahilTL}')">Kopyala</button>
+                </div>
             </div>
         `;
         vekaletResult.style.display = 'block';
@@ -403,13 +424,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
             html += `
                 <div class="history-item" data-index="${index}">
-                    <div class="history-date">${item.tarih}</div>
-                    <div>${item.tur}: ${aciklama} | Ücret: ${Utils.formatCurrency(item.ucret)}</div>
+                    <div class="history-date">${Utils.escapeHTML(item.tarih)}</div>
+                    <div>${Utils.escapeHTML(item.tur)}: ${Utils.escapeHTML(aciklama)} | Ücret: ${Utils.escapeHTML(Utils.formatCurrency(item.ucret))}</div>
                 </div>
             `;
         });
 
         vekaletHistory.innerHTML = html;
+
+        // Tıklama olayı
+        document.querySelectorAll('#vekalet-history .history-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const index = parseInt(this.getAttribute('data-index'));
+                const h = vekaletHistoryData[index];
+
+                if (h.tur === 'Nispi Ücret') {
+                    hesaplamaTuru.value = 'nispi';
+                    hesaplamaTuru.dispatchEvent(new Event('change'));
+                    davaDegeriInput.value = Utils.formatNumber(h.davaDegeri);
+                } else {
+                    hesaplamaTuru.value = 'maktu';
+                    hesaplamaTuru.dispatchEvent(new Event('change'));
+                    // Not: Kategori ve alt tür seçimi için data-index üzerinden 
+                    // orijinal seçimleri saklamak daha iyi olurdu ama şu an UI'ı manuel doldurmak zor.
+                    // En azından nispi için çalışması faydalı.
+                }
+                vekaletForm.dispatchEvent(new Event('submit'));
+            });
+        });
     }
 
     // Sayfa yüklendiğinde geçmişi göster

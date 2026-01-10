@@ -118,8 +118,16 @@
         .result-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 10px 0;
             border-bottom: 1px solid #eee;
+            gap: 15px;
+        }
+
+        .result-item>div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .result-item:last-child {
@@ -249,6 +257,59 @@
             flex: 1;
         }
 
+        .copy-btn {
+            background: none;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 12px;
+            color: #6b7280;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s;
+            width: auto;
+            line-height: normal;
+        }
+
+        .copy-btn:hover {
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+            color: var(--primary-color);
+        }
+
+        .copy-btn.copied {
+            background-color: #ecfdf5;
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
         .input-group-append button {
             width: auto;
             white-space: nowrap;
@@ -266,6 +327,7 @@
             <div class="tab active" id="tab-makbuz">Makbuz Hesaplama</div>
             <div class="tab" id="tab-faiz">Faiz Hesaplama</div>
             <div class="tab" id="tab-vekalet">Vekalet Ücreti</div>
+            <div class="tab" id="tab-icra">İcra Vekalet Ücreti</div>
         </div>
         <div id="makbuz-content">
             <div class="card">
@@ -402,6 +464,40 @@
             </div>
         </div>
     </div>
+    <!-- İcra Vekalet Ücreti İçeriği -->
+    <div id="icra-content" style="display: none;">
+        <div class="card">
+            <h2>İcra Vekalet Ücreti Hesaplama</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">AAÜT 2025-2026 (Kesinleşme Öncesi / Sonrası)
+            </p>
+            <form id="icra-form">
+                <div class="form-group">
+                    <label for="icra-anapara">Takip Anaparası (TL)</label>
+                    <input type="text" id="icra-anapara" placeholder="Anapara tutarını giriniz" required>
+                </div>
+                <div class="form-group">
+                    <label for="icra-faiz">İşlemiş Faiz (TL) - İsteğe Bağlı</label>
+                    <input type="text" id="icra-faiz" placeholder="Varsa işlemiş faiz tutarını giriniz">
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                    <input type="checkbox" id="erken-odeme" style="width: auto;">
+                    <label for="erken-odeme" style="margin-bottom: 0;">Ödeme emri tebliğinden itibaren 7 gün içinde
+                        ödeme (%25 indirimli vekalet ücreti)</label>
+                </div>
+                <button type="submit" style="margin-top: 20px;">Hesapla</button>
+            </form>
+            <div class="result" id="icra-result" style="display: none;">
+                <h3>Hesaplama Sonuçları</h3>
+                <div id="icra-sonuc-icerik"></div>
+            </div>
+        </div>
+        <div class="card history">
+            <h2>Hesaplama Geçmişi</h2>
+            <div id="icra-history">
+                <p>Henüz hesaplama yapılmadı.</p>
+            </div>
+        </div>
+    </div>
     <!-- Rates Modal -->
     <div id="rates-modal" class="modal">
         <div class="modal-content"><span class="close-modal" id="close-rates">&times;
@@ -420,6 +516,7 @@
     <script src="makbuz.js"></script>
     <script src="faiz.js"></script>
     <script src="vekalet.js"></script>
+    <script src="icra-vekalet.js"></script>
     <script>if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(registration => {

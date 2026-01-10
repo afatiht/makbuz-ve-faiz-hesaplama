@@ -10,18 +10,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const tabMakbuz = document.getElementById('tab-makbuz');
     const tabFaiz = document.getElementById('tab-faiz');
     const tabVekalet = document.getElementById('tab-vekalet');
+    const tabIcra = document.getElementById('tab-icra');
     const makbuzContent = document.getElementById('makbuz-content');
     const faizContent = document.getElementById('faiz-content');
     const vekaletContent = document.getElementById('vekalet-content');
+    const icraContent = document.getElementById('icra-content');
 
     // Tüm tabları ve içerikleri gizle fonksiyonu
     function hideAllTabs() {
         tabMakbuz.classList.remove('active');
         tabFaiz.classList.remove('active');
         if (tabVekalet) tabVekalet.classList.remove('active');
+        if (tabIcra) tabIcra.classList.remove('active');
         makbuzContent.style.display = 'none';
         faizContent.style.display = 'none';
         if (vekaletContent) vekaletContent.style.display = 'none';
+        if (icraContent) icraContent.style.display = 'none';
     }
 
     tabMakbuz.addEventListener('click', function () {
@@ -41,6 +45,14 @@ document.addEventListener('DOMContentLoaded', function () {
             hideAllTabs();
             tabVekalet.classList.add('active');
             vekaletContent.style.display = 'block';
+        });
+    }
+
+    if (tabIcra) {
+        tabIcra.addEventListener('click', function () {
+            hideAllTabs();
+            tabIcra.classList.add('active');
+            icraContent.style.display = 'block';
         });
     }
 
@@ -91,14 +103,46 @@ document.addEventListener('DOMContentLoaded', function () {
             // Net tahsilat hesapla
             const netTahsilat = brutTutar + tahsilEdilecekKDV - stopajTutari;
 
-            // Sonuçları göster
-            document.getElementById('result-brut').textContent = Utils.formatCurrency(brutTutar);
-            document.getElementById('result-kdv').textContent = Utils.formatCurrency(kdvTutari);
-            document.getElementById('result-tevkifat').textContent = Utils.formatCurrency(tevkifatTutari);
-            document.getElementById('result-tahsil-kdv').textContent = Utils.formatCurrency(tahsilEdilecekKDV);
-            document.getElementById('result-stopaj').textContent = Utils.formatCurrency(stopajTutari);
-            document.getElementById('result-toplam').textContent = Utils.formatCurrency(kdvDahilToplam);
-            document.getElementById('result-net').textContent = Utils.formatCurrency(netTahsilat);
+            // Sonuçları göster ve kopyalama butonlarını ekle
+            const results = [
+                { id: 'result-brut', value: brutTutar },
+                { id: 'result-kdv', value: kdvTutari },
+                { id: 'result-tevkifat', value: tevkifatTutari },
+                { id: 'result-tahsil-kdv', value: tahsilEdilecekKDV },
+                { id: 'result-stopaj', value: stopajTutari },
+                { id: 'result-toplam', value: kdvDahilToplam },
+                { id: 'result-net', value: netTahsilat }
+            ];
+
+            results.forEach(res => {
+                const el = document.getElementById(res.id);
+                el.textContent = Utils.formatCurrency(res.value);
+
+                // Konteyner div oluştur/bul
+                let container = el.parentNode.querySelector('div.result-value-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.className = 'result-value-container';
+                    // Değeri konteynere taşı
+                    el.parentNode.appendChild(container);
+                    container.appendChild(el);
+                }
+
+                // Kopyalama butonu ekle/yenile
+                let copyBtn = container.querySelector('.copy-btn');
+                if (!copyBtn) {
+                    copyBtn = document.createElement('button');
+                    copyBtn.className = 'copy-btn';
+                    copyBtn.textContent = 'Kopyala';
+                    container.appendChild(copyBtn);
+                }
+
+                const newBtn = copyBtn.cloneNode(true);
+                copyBtn.parentNode.replaceChild(newBtn, copyBtn);
+                newBtn.addEventListener('click', () => {
+                    Utils.handleCopyClick(newBtn, Utils.formatNumber(res.value));
+                });
+            });
 
             makbuzResult.style.display = 'block';
 
@@ -137,8 +181,8 @@ document.addEventListener('DOMContentLoaded', function () {
         makbuzHistoryData.forEach((item, index) => {
             html += `
                 <div class="history-item" data-index="${index}">
-                    <div class="history-date">${item.tarih}</div>
-                    <div>Toplam: ${Utils.formatCurrency(item.kdvDahilToplam)} | KDV: %${item.kdvOrani} | Net: ${Utils.formatCurrency(item.netTahsilat)}</div>
+                    <div class="history-date">${Utils.escapeHTML(item.tarih)}</div>
+                    <div>Toplam: ${Utils.escapeHTML(Utils.formatCurrency(item.kdvDahilToplam))} | KDV: %${Utils.escapeHTML(item.kdvOrani.toString())} | Net: ${Utils.escapeHTML(Utils.formatCurrency(item.netTahsilat))}</div>
                 </div>
             `;
         });

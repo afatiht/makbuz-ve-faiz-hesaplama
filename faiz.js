@@ -63,12 +63,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const toplamTutar = anapara + faizTutari;
 
-            // Sonuçları göster
-            document.getElementById('result-anapara').textContent = Utils.formatCurrency(anapara);
-            document.getElementById('result-oran').textContent = `%${kullanilacakOran.toFixed(2)}`;
-            document.getElementById('result-gun').textContent = gunFarki;
-            document.getElementById('result-faiz').textContent = Utils.formatCurrency(faizTutari);
-            document.getElementById('result-faiz-toplam').textContent = Utils.formatCurrency(toplamTutar);
+            // Sonuçları göster ve kopyalama butonlarını ekle
+            const results = [
+                { id: 'result-anapara', value: anapara, type: 'currency' },
+                { id: 'result-oran', value: `%${kullanilacakOran.toFixed(2)}`, type: 'text' },
+                { id: 'result-gun', value: gunFarki, type: 'text' },
+                { id: 'result-faiz', value: faizTutari, type: 'currency' },
+                { id: 'result-faiz-toplam', value: toplamTutar, type: 'currency' }
+            ];
+
+            results.forEach(res => {
+                const el = document.getElementById(res.id);
+                el.textContent = res.type === 'currency' ? Utils.formatCurrency(res.value) : res.value;
+
+                // Sadece para birimi olanlara kopyalama butonu ekle
+                if (res.type === 'currency') {
+                    // Konteyner div oluştur/bul
+                    let container = el.parentNode.querySelector('div.result-value-container');
+                    if (!container) {
+                        container = document.createElement('div');
+                        container.className = 'result-value-container';
+                        // Değeri konteynere taşı
+                        el.parentNode.appendChild(container);
+                        container.appendChild(el);
+                    }
+
+                    let copyBtn = container.querySelector('.copy-btn');
+                    if (!copyBtn) {
+                        copyBtn = document.createElement('button');
+                        copyBtn.className = 'copy-btn';
+                        copyBtn.textContent = 'Kopyala';
+                        container.appendChild(copyBtn);
+                    }
+
+                    const newBtn = copyBtn.cloneNode(true);
+                    copyBtn.parentNode.replaceChild(newBtn, copyBtn);
+                    newBtn.addEventListener('click', () => {
+                        Utils.handleCopyClick(newBtn, Utils.formatNumber(res.value));
+                    });
+                }
+            });
 
             faizResult.style.display = 'block';
 
@@ -109,8 +143,8 @@ document.addEventListener('DOMContentLoaded', function () {
         faizHistoryData.forEach((item, index) => {
             html += `
                 <div class="history-item" data-index="${index}">
-                    <div class="history-date">${item.tarih}</div>
-                    <div>Anapara: ${Utils.formatCurrency(item.anapara)} | Faiz: %${item.faizOrani.toFixed(2)} | Toplam: ${Utils.formatCurrency(item.toplamTutar)}</div>
+                    <div class="history-date">${Utils.escapeHTML(item.tarih)}</div>
+                    <div>Anapara: ${Utils.escapeHTML(Utils.formatCurrency(item.anapara))} | Faiz: %${Utils.escapeHTML(item.faizOrani.toFixed(2))} | Toplam: ${Utils.escapeHTML(Utils.formatCurrency(item.toplamTutar))}</div>
                 </div>
             `;
         });
@@ -172,7 +206,10 @@ document.addEventListener('DOMContentLoaded', function () {
     getRatesBtn.addEventListener('click', async () => {
         // Key is now hardcoded in service, no need to check here
         ratesModal.style.display = 'block';
-        ratesList.innerHTML = '<p>Veriler çekiliyor, lütfen bekleyiniz...</p>';
+        ratesList.innerHTML = `
+            <div class="spinner"></div>
+            <p class="loading-text">Veriler çekiliyor, lütfen bekleyiniz...</p>
+        `;
 
         try {
             const rates = await TCMBService.getCommonRates();
