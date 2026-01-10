@@ -186,38 +186,33 @@ const IcraVekaletService = {
     },
 
     /**
-     * Tersine hesaplama - Ödenmesi gereken tutardan anapara bul
-     * @param {number} odenecekTutar - Toplam ödenecek tutar
-     * @param {boolean} kesinlesmisMi - Kesinleşme durumu
-     * @returns {Object} - Tahmini anapara ve detaylar
+     * Vekalet ücretinden anapara bul (Matematiksel ters hesaplama)
+     * @param {number} vekaletUcreti - Ödenmesi gereken veya takdir edilen vekalet ücreti
+     * @returns {number} - Hesaplanan anapara tutarı
      */
-    terstenHesapla: (odenecekTutar, kesinlesmisMi = false) => {
-        // İteratif yaklaşım ile anapara bul
-        let tahminAnapara = odenecekTutar * 0.8; // Başlangıç tahmini
-        let oncekiFark = Infinity;
-
-        for (let i = 0; i < 50; i++) { // Maksimum 50 iterasyon
-            const sonuc = IcraVekaletService.hesaplaIcraDosyasi(tahminAnapara, 0, false);
-            const hedefToplam = kesinlesmisMi ? sonuc.kesinlesmeSonrasi.toplam : sonuc.kesinlesmeOncesi.toplam;
-            const fark = odenecekTutar - hedefToplam;
-
-            if (Math.abs(fark) < 1) { // 1 TL tolerans
-                break;
-            }
-
-            if (Math.abs(fark) >= Math.abs(oncekiFark)) {
-                // Yakınsama durdu
-                break;
-            }
-
-            tahminAnapara += fark * 0.7; // Düzeltme faktörü
-            oncekiFark = fark;
+    vekaletUcretindenAnaparaBul: (vekaletUcreti) => {
+        if (vekaletUcreti <= ICRA_AAUT.maktuIcra) {
+            return ICRA_AAUT.nispiEsik; // Maktu ücret sınırı
         }
 
-        return {
-            tahminAnapara: Math.round(tahminAnapara * 100) / 100,
-            dogrulama: IcraVekaletService.hesaplaIcraDosyasi(tahminAnapara, 0, false)
-        };
+        let kalanUcret = vekaletUcreti;
+        let anapara = 0;
+        let oncekiLimit = 0;
+
+        for (const dilim of ICRA_AAUT.nispiDilimler) {
+            const dilimKapasiteUcreti = (dilim.limit === Infinity) ? Infinity : dilim.limit * dilim.oran;
+
+            if (kalanUcret <= dilimKapasiteUcreti) {
+                anapara += kalanUcret / dilim.oran;
+                kalanUcret = 0;
+                break;
+            } else {
+                anapara += dilim.limit;
+                kalanUcret -= dilimKapasiteUcreti;
+            }
+        }
+
+        return Math.round(anapara * 100) / 100;
     },
 
     /**
@@ -244,15 +239,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Form elementleri
     const icraForm = document.getElementById('icra-form');
+    const hesapTuruSelect = document.getElementById('icra-hesap-turu');
+    const anaparaAlani = document.getElementById('icra-anapara-alani');
+    const vekaletAlani = document.getElementById('icra-vekalet-alani');
+
     const anaparaInput = document.getElementById('icra-anapara');
     const faizInput = document.getElementById('icra-faiz');
-    const erkenOdemeCheck = document.getElementById('erken-odeme');
+    const vekaletInput = document.getElementById('icra-vekalet-input');
+
     const icraResult = document.getElementById('icra-result');
     const icraHistory = document.getElementById('icra-history');
 
     // Input maskeleme
     if (anaparaInput) InputMask.attach(anaparaInput);
     if (faizInput) InputMask.attach(faizInput);
+    if (vekaletInput) InputMask.attach(vekaletInput);
+
+    // Hesaplama yöntemi değişimi
+    if (hesapTuruSelect) {
+        hesapTuruSelect.addEventListener('change', function () {
+            if (this.value === 'anapara') {
+                anaparaAlani.style.display = 'block';
+                vekaletAlani.style.display = 'none';
+                anaparaInput.required = true;
+                vekaletInput.required = false;
+            } else {
+                anaparaAlani.style.display = 'none';
+                vekaletAlani.style.display = 'block';
+                anaparaInput.required = false;
+                vekaletInput.required = true;
+            }
+        });
+    }
 
     // Hesaplama geçmişi
     let icraHistoryData = JSON.parse(localStorage.getItem('icraHistory')) || [];
@@ -262,16 +280,30 @@ document.addEventListener('DOMContentLoaded', function () {
         icraForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const anapara = Utils.parseCurrency(anaparaInput.value);
-            const faiz = Utils.parseCurrency(faizInput.value) || 0;
-            const erkenOdeme = erkenOdemeCheck ? erkenOdemeCheck.checked : false;
+            let anapara, faiz;
+
+            if (hesapTuruSelect.value === 'anapara') {
+                anapara = Utils.parseCurrency(anaparaInput.value);
+                faiz = Utils.parseCurrency(faizInput.value) || 0;
+            } else {
+                const girilenVekalet = Utils.parseCurrency(vekaletInput.value);
+                if (girilenVekalet <= 0) {
+                    alert('Lütfen geçerli bir vekalet ücreti giriniz.');
+                    return;
+                }
+                anapara = IcraVekaletService.vekaletUcretindenAnaparaBul(girilenVekalet);
+                faiz = 0;
+            }
 
             if (anapara <= 0) {
-                alert('Lütfen geçerli bir anapara tutarı giriniz.');
+                alert('Lütfen geçerli bilgiler giriniz.');
                 return;
             }
 
-            const sonuc = IcraVekaletService.hesaplaIcraDosyasi(anapara, faiz, erkenOdeme);
+            // Erken ödeme artık opsiyonel DEĞİL, her iki kart da gösterileceği için 
+            // hesaplaIcraDosyasi'na her zaman true gönderiyoruz ya da fonksiyonu otonom yapıyoruz.
+            // Buradaki true parametresi sadece kesinlesmeOncesi kartının indirim uygulamasını sağlar.
+            const sonuc = IcraVekaletService.hesaplaIcraDosyasi(anapara, faiz, true);
             gosterSonuc(sonuc);
 
             // Geçmişe ekle
@@ -279,7 +311,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 tarih: new Date().toLocaleString('tr-TR'),
                 anapara: anapara,
                 faiz: faiz,
-                erkenOdeme: erkenOdeme,
+                // Kayıt için eski flag'i pasif tutuyoruz veya kaldırabiliriz
+                erkenOdeme: true,
                 kesinlesmeOncesi: sonuc.kesinlesmeOncesi.toplam,
                 kesinlesmeSonrasi: sonuc.kesinlesmeSonrasi.toplam
             };
@@ -431,12 +464,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 const hesaplama = icraHistoryData[index];
 
                 anaparaInput.value = Utils.formatNumber(hesaplama.anapara);
-                if (faizInput && hesaplama.faiz) {
-                    faizInput.value = Utils.formatNumber(hesaplama.faiz);
+                if (faizInput) {
+                    faizInput.value = Utils.formatNumber(hesaplama.faiz || 0);
                 }
-                if (erkenOdemeCheck) {
-                    erkenOdemeCheck.checked = hesaplama.erkenOdeme;
-                }
+
+                // Hesaplama türünü anaparaya çek (geçmişten yükleme anapara üzerinden yapılır)
+                hesapTuruSelect.value = 'anapara';
+                anaparaAlani.style.display = 'block';
+                vekaletAlani.style.display = 'none';
 
                 icraForm.dispatchEvent(new Event('submit'));
             });

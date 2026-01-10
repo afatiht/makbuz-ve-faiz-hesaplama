@@ -472,19 +472,34 @@
             </p>
             <form id="icra-form">
                 <div class="form-group">
-                    <label for="icra-anapara">Takip Anaparası (TL)</label>
-                    <input type="text" id="icra-anapara" placeholder="Anapara tutarını giriniz" required>
+                    <label for="icra-hesap-turu">Hesaplama Yöntemi</label>
+                    <select id="icra-hesap-turu">
+                        <option value="anapara">Anapara üzerinden hesapla</option>
+                        <option value="vekalet">Vekalet ücreti üzerinden hesapla</option>
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label for="icra-faiz">İşlemiş Faiz (TL) - İsteğe Bağlı</label>
-                    <input type="text" id="icra-faiz" placeholder="Varsa işlemiş faiz tutarını giriniz">
+
+                <div id="icra-anapara-alani">
+                    <div class="form-group">
+                        <label for="icra-anapara">Takip Anaparası (TL)</label>
+                        <input type="text" id="icra-anapara" placeholder="Anapara tutarını giriniz">
+                    </div>
+                    <div class="form-group">
+                        <label for="icra-faiz">İşlemiş Faiz (TL) - İsteğe Bağlı</label>
+                        <input type="text" id="icra-faiz" placeholder="Varsa işlemiş faiz tutarını giriniz">
+                    </div>
                 </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                    <input type="checkbox" id="erken-odeme" style="width: auto;">
-                    <label for="erken-odeme" style="margin-bottom: 0;">Ödeme emri tebliğinden itibaren 7 gün içinde
-                        ödeme (%25 indirimli vekalet ücreti)</label>
+
+                <div id="icra-vekalet-alani" style="display: none;">
+                    <div class="form-group">
+                        <label for="icra-vekalet-input">Dosyadaki Vekalet Ücreti (TL)</label>
+                        <input type="text" id="icra-vekalet-input" placeholder="Vekalet ücretini giriniz">
+                    </div>
+                    <p style="font-size: 12px; color: #666; margin-top: -15px; margin-bottom: 15px;">* Girilen vekalet
+                        ücretinin "Tam Ücret" (Kesinleşme Sonrası) olduğu varsayılır.</p>
                 </div>
-                <button type="submit" style="margin-top: 20px;">Hesapla</button>
+
+                <button type="submit" style="margin-top: 10px;">Hesapla</button>
             </form>
             <div class="result" id="icra-result" style="display: none;">
                 <h3>Hesaplama Sonuçları</h3>
