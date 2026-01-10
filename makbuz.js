@@ -9,22 +9,40 @@ document.addEventListener('DOMContentLoaded', function () {
     // Tab değiştirme işlevselliği
     const tabMakbuz = document.getElementById('tab-makbuz');
     const tabFaiz = document.getElementById('tab-faiz');
+    const tabVekalet = document.getElementById('tab-vekalet');
     const makbuzContent = document.getElementById('makbuz-content');
     const faizContent = document.getElementById('faiz-content');
+    const vekaletContent = document.getElementById('vekalet-content');
+
+    // Tüm tabları ve içerikleri gizle fonksiyonu
+    function hideAllTabs() {
+        tabMakbuz.classList.remove('active');
+        tabFaiz.classList.remove('active');
+        if (tabVekalet) tabVekalet.classList.remove('active');
+        makbuzContent.style.display = 'none';
+        faizContent.style.display = 'none';
+        if (vekaletContent) vekaletContent.style.display = 'none';
+    }
 
     tabMakbuz.addEventListener('click', function () {
+        hideAllTabs();
         tabMakbuz.classList.add('active');
-        tabFaiz.classList.remove('active');
         makbuzContent.style.display = 'block';
-        faizContent.style.display = 'none';
     });
 
     tabFaiz.addEventListener('click', function () {
+        hideAllTabs();
         tabFaiz.classList.add('active');
-        tabMakbuz.classList.remove('active');
         faizContent.style.display = 'block';
-        makbuzContent.style.display = 'none';
     });
+
+    if (tabVekalet) {
+        tabVekalet.addEventListener('click', function () {
+            hideAllTabs();
+            tabVekalet.classList.add('active');
+            vekaletContent.style.display = 'block';
+        });
+    }
 
     // Makbuz hesaplama formu
     const makbuzForm = document.getElementById('makbuz-form');

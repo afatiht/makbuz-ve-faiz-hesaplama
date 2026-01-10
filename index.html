@@ -265,6 +265,7 @@
         <div class="tabs">
             <div class="tab active" id="tab-makbuz">Makbuz Hesaplama</div>
             <div class="tab" id="tab-faiz">Faiz Hesaplama</div>
+            <div class="tab" id="tab-vekalet">Vekalet Ücreti</div>
         </div>
         <div id="makbuz-content">
             <div class="card">
@@ -352,6 +353,55 @@
             </div>
         </div>
     </div>
+    <!-- Vekalet Ücreti İçeriği -->
+    <div id="vekalet-content" style="display: none;">
+        <div class="card">
+            <h2>Vekalet Ücreti Hesaplama</h2>
+            <p id="tarife-bilgisi" style="color: #666; font-size: 14px; margin-bottom: 15px;"></p>
+            <form id="vekalet-form">
+                <div class="form-group">
+                    <label for="hesaplama-turu">Hesaplama Türü</label>
+                    <select id="hesaplama-turu">
+                        <option value="maktu">Maktu Ücret (Sabit)</option>
+                        <option value="nispi">Nispi Ücret (Dava Değerine Göre)</option>
+                    </select>
+                </div>
+                <div id="maktu-secim-alani">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vekalet-kategori">Kategori</label>
+                            <select id="vekalet-kategori">
+                                <option value="">Kategori Seçiniz</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vekalet-alt-tur">Mahkeme/Hizmet Türü</label>
+                            <select id="vekalet-alt-tur">
+                                <option value="">Alt Tür Seçiniz</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="nispi-secim-alani" style="display: none;">
+                    <div class="form-group">
+                        <label for="dava-degeri">Dava Değeri (TL)</label>
+                        <input type="text" id="dava-degeri" placeholder="Dava değerini giriniz">
+                    </div>
+                </div>
+                <button type="submit">Hesapla</button>
+            </form>
+            <div class="result" id="vekalet-result" style="display: none;">
+                <h3>Hesaplama Sonuçları</h3>
+                <div id="vekalet-sonuc-icerik"></div>
+            </div>
+        </div>
+        <div class="card history">
+            <h2>Hesaplama Geçmişi</h2>
+            <div id="vekalet-history">
+                <p>Henüz hesaplama yapılmadı.</p>
+            </div>
+        </div>
+    </div>
     <!-- Rates Modal -->
     <div id="rates-modal" class="modal">
         <div class="modal-content"><span class="close-modal" id="close-rates">&times;
@@ -369,16 +419,17 @@
     <script src="input-mask.js"></script>
     <script src="makbuz.js"></script>
     <script src="faiz.js"></script>
+    <script src="vekalet.js"></script>
     <script>if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js').then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
 
-                    }).catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
                 });
-            }
+            });
+        }
 
     </script>
 </body>
