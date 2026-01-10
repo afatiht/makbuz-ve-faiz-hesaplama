@@ -71,7 +71,6 @@ const ICRA_VERILERI = {
 
 // Aktif Tarife (Varsayılan 2026)
 let aktifIcraYili = '2026';
-let ICRA_AAUT = ICRA_VERILERI[aktifIcraYili];
 
 // İcra Vekalet Ücreti Hesaplama Servisi
 const IcraVekaletService = {
@@ -85,12 +84,13 @@ const IcraVekaletService = {
             return { ucret: 0, detaylar: [] };
         }
 
+        const data = ICRA_VERILERI[aktifIcraYili];
         // Eşik değerin altındaysa maktu ücret uygula
-        if (takipTutari <= ICRA_AAUT.nispiEsik) {
+        if (takipTutari <= data.nispiEsik) {
             return {
-                ucret: ICRA_AAUT.maktuIcra,
+                ucret: data.maktuIcra,
                 maktuUygulandi: true,
-                aciklama: `Takip tutarı ${Utils.formatCurrency(ICRA_AAUT.nispiEsik)} altında olduğundan maktu ücret uygulanır`
+                aciklama: `Takip tutarı ${Utils.formatCurrency(data.nispiEsik)} altında olduğundan maktu ücret uygulanır`
             };
         }
 
@@ -99,7 +99,7 @@ const IcraVekaletService = {
         const detaylar = [];
         let oncekiToplam = 0;
 
-        for (const dilim of ICRA_AAUT.nispiDilimler) {
+        for (const dilim of data.nispiDilimler) {
             if (kalanDeger <= 0) break;
 
             const dilimDegeri = Math.min(kalanDeger, dilim.limit);
@@ -126,9 +126,9 @@ const IcraVekaletService = {
         }
 
         // Nispi ücret maktu ücretten az olamaz
-        if (toplamUcret < ICRA_AAUT.maktuIcra) {
+        if (toplamUcret < data.maktuIcra) {
             return {
-                ucret: ICRA_AAUT.maktuIcra,
+                ucret: data.maktuIcra,
                 maktuUygulandi: true,
                 aciklama: 'Nispi hesaplama maktu ücretten düşük olduğundan maktu ücret uygulanır'
             };
@@ -152,22 +152,22 @@ const IcraVekaletService = {
     hesaplaIcraDosyasi: (anaparaTutari, faizTutari = 0, erkenOdeme = false) => {
         const takipTutari = anaparaTutari + faizTutari;
 
-        // Vekalet ücreti hesapla (Tam ücret)
+        const data = ICRA_VERILERI[aktifIcraYili];
         const vekaletSonuc = IcraVekaletService.hesaplaNispiUcret(takipTutari);
         const tamVekaletUcreti = vekaletSonuc.ucret;
 
         // Erken ödeme indirimi (Sadece kesinleşme öncesi için geçerli olabilir)
         const indirimliVekaletUcreti = erkenOdeme
-            ? tamVekaletUcreti * ICRA_AAUT.erkenOdemeOrani
+            ? tamVekaletUcreti * data.erkenOdemeOrani
             : tamVekaletUcreti;
 
         // Masraflar
-        const masraflar = ICRA_AAUT.masraflar;
+        const masraflar = data.masraflar;
         const toplamMasraf = masraflar.basvuruHarci + masraflar.vekaletnameHarci +
             masraflar.vekaletPulu + masraflar.tebligatUcreti + masraflar.dosyaMasrafi;
 
         // Peşin harç (binde 5)
-        const pesinHarc = takipTutari * ICRA_AAUT.oranlar.pesinHarc;
+        const pesinHarc = takipTutari * data.oranlar.pesinHarc;
 
         // Kesinleşme öncesi toplam (İndirimli vekalet ücreti kullanılırsa)
         const kesinlesmeOncesi = {
@@ -183,7 +183,7 @@ const IcraVekaletService = {
 
         // Tahsil harcı (%4.55) - kesinleşme sonrası ödenir
         // Not: Peşin harç tahsil harcından mahsup edilir
-        const toplamTahsilHarci = takipTutari * ICRA_AAUT.oranlar.tahsilHarciHacizOncesi;
+        const toplamTahsilHarci = takipTutari * data.oranlar.tahsilHarciHacizOncesi;
         const kalanTahsilHarci = Math.max(0, toplamTahsilHarci - pesinHarc);
 
         // Kesinleşme sonrası toplam (Her zaman tam vekalet ücreti kullanılır)
@@ -242,7 +242,8 @@ const IcraVekaletService = {
      * Masraf detaylarını getir
      */
     getMasrafDetaylari: () => {
-        return Object.entries(ICRA_AAUT.masraflar).map(([key, value]) => {
+        const data = ICRA_VERILERI[aktifIcraYili];
+        return Object.entries(data.masraflar).map(([key, value]) => {
             const isimler = {
                 basvuruHarci: 'Başvuru Harcı',
                 vekaletnameHarci: 'Vekalet Suret Harcı',
@@ -283,7 +284,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (icraYilSelect) {
         icraYilSelect.addEventListener('change', function () {
             aktifIcraYili = this.value;
-            ICRA_AAUT = ICRA_VERILERI[aktifIcraYili];
             // Eğer sonuç varsa yeniden hesaplat
             if (icraResult.style.display !== 'none') {
                 icraForm.dispatchEvent(new Event('submit'));
@@ -399,11 +399,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span>${Utils.escapeHTML(Utils.formatCurrency(ko.masraflar))}</span>
                     </div>
                     <div class="cost-breakdown">
-                        <div><span>• Başvuru Harcı:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.basvuruHarci)}</span></div>
-                        <div><span>• Vekalet Suret:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.vekaletnameHarci)}</span></div>
-                        <div><span>• Vekalet Pulu:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.vekaletPulu)}</span></div>
-                        <div><span>• Tebligat/Posta:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.tebligatUcreti)}</span></div>
-                        <div><span>• Dosya Masrafı:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.dosyaMasrafi)}</span></div>
+                        <div><span>• Başvuru Harcı:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.basvuruHarci)}</span></div>
+                        <div><span>• Vekalet Suret:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.vekaletnameHarci)}</span></div>
+                        <div><span>• Vekalet Pulu:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.vekaletPulu)}</span></div>
+                        <div><span>• Tebligat/Posta:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.tebligatUcreti)}</span></div>
+                        <div><span>• Dosya Masrafı:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.dosyaMasrafi)}</span></div>
                     </div>
                     <div class="result-item" style="font-size: 18px; font-weight: bold; background: #dbeafe; padding: 10px; border-radius: 5px; margin-top: 10px;">
                         <span>TOPLAM:</span>
@@ -448,11 +448,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span>${Utils.escapeHTML(Utils.formatCurrency(ks.masraflar))}</span>
                     </div>
                     <div class="cost-breakdown">
-                        <div><span>• Başvuru Harcı:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.basvuruHarci)}</span></div>
-                        <div><span>• Vekalet Suret:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.vekaletnameHarci)}</span></div>
-                        <div><span>• Vekalet Pulu:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.vekaletPulu)}</span></div>
-                        <div><span>• Tebligat/Posta:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.tebligatUcreti)}</span></div>
-                        <div><span>• Dosya Masrafı:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.dosyaMasrafi)}</span></div>
+                        <div><span>• Başvuru Harcı:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.basvuruHarci)}</span></div>
+                        <div><span>• Vekalet Suret:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.vekaletnameHarci)}</span></div>
+                        <div><span>• Vekalet Pulu:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.vekaletPulu)}</span></div>
+                        <div><span>• Tebligat/Posta:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.tebligatUcreti)}</span></div>
+                        <div><span>• Dosya Masrafı:</span> <span>${Utils.formatCurrency(ICRA_VERILERI[aktifIcraYili].masraflar.dosyaMasrafi)}</span></div>
                     </div>
                     <div class="result-item" style="font-size: 18px; font-weight: bold; background: #dcfce7; padding: 10px; border-radius: 5px; margin-top: 10px;">
                         <span>TOPLAM:</span>
