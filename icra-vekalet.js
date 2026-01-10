@@ -3,52 +3,75 @@
  * İcra dosyalarında kesinleşme öncesi ve sonrası vekalet ücreti hesaplama
  */
 
-// İcra Vekalet Ücreti Sabitleri (AAÜT 2025-2026)
-const ICRA_AAUT = {
-    yil: '2025-2026',
-
-    // Maktu ücretler
-    maktuIcra: 9000,           // Genel icra takibi maktu ücreti
-    maktuTahliye: 20000,       // Tahliye icra takibi
-    maktuIcraMahkemesi: 11000, // İcra Mahkemesi işleri (AAÜT 2025-2026)
-
-    // Nispi hesaplama eşiği
-    // Nispi hesaplama sonucu maktu ücretten düşük olamaz
-    // 9.000 TL / 0.16 = 56.250 TL (bu tutara kadar maktu ücret uygulanır)
-    nispiEsik: 56250,
-
-    // Nispi ücret dilimleri (Vekalet modülündeki ile aynı)
-    nispiDilimler: [
-        { limit: 600000, oran: 0.16 },
-        { limit: 600000, oran: 0.15 },
-        { limit: 1200000, oran: 0.14 },
-        { limit: 1200000, oran: 0.13 },
-        { limit: 1800000, oran: 0.11 },
-        { limit: 2400000, oran: 0.08 },
-        { limit: 3000000, oran: 0.05 },
-        { limit: 3600000, oran: 0.03 },
-        { limit: Infinity, oran: 0.01 }
-    ],
-
-    // Erken ödeme indirimi (7 gün içinde ödeme)
-    erkenOdemeOrani: 0.75, // %75'i ödenir (1/4 indirim)
-
-    // İcra masrafları (2025 Resmi Rakamlar)
-    masraflar: {
-        basvuruHarci: 615.40,         // İcra başvuru harcı
-        vekaletnameHarci: 87.50,       // Vekalet suret harcı
-        vekaletPulu: 138.00,           // Vekalet pulu
-        tebligatUcreti: 250,           // Tahmini tebligat ve posta (2025 ortalama)
-        dosyaMasrafi: 100              // Tahmini dosya masrafı
+// İcra Vekalet Ücreti Verileri (2025 ve 2026)
+const ICRA_VERILERI = {
+    '2026': {
+        yil: '2026',
+        maktuIcra: 9000,
+        maktuTahliye: 20000,
+        maktuIcraMahkemesi: 11000,
+        nispiEsik: 56250,
+        nispiDilimler: [
+            { limit: 600000, oran: 0.16 },
+            { limit: 600000, oran: 0.15 },
+            { limit: 1200000, oran: 0.14 },
+            { limit: 1200000, oran: 0.13 },
+            { limit: 1800000, oran: 0.11 },
+            { limit: 2400000, oran: 0.08 },
+            { limit: 3000000, oran: 0.05 },
+            { limit: 3600000, oran: 0.03 },
+            { limit: Infinity, oran: 0.01 }
+        ],
+        erkenOdemeOrani: 0.75,
+        masraflar: {
+            basvuruHarci: 732.00,          // İcra başvuru harcı (2026)
+            vekaletnameHarci: 104.00,       // Vekalet suret harcı (2026)
+            vekaletPulu: 164.00,            // Vekalet pulu (2026)
+            tebligatUcreti: 350.00,         // Tahmini (2026)
+            dosyaMasrafi: 150.00            // Tahmini (2026)
+        },
+        oranlar: {
+            pesinHarc: 0.005,
+            tahsilHarciHacizOncesi: 0.0455,
+            tahsilHarciHaricen: 0.0227
+        }
     },
-
-    // Oranlar (2025)
-    oranlar: {
-        pesinHarc: 0.005,              // Peşin harç (binde 5) - İlamsız takiplerde
-        tahsilHarciHacizOncesi: 0.0455, // Tahsil harcı (Hacizden önce ödeme)
-        tahsilHarciHaricen: 0.0227      // Haricen tahsilat (Dışarıdan ödeme bildirimi)
+    '2025': {
+        yil: '2025',
+        maktuIcra: 9000,
+        maktuTahliye: 20000,
+        maktuIcraMahkemesi: 11000,
+        nispiEsik: 56250,
+        nispiDilimler: [
+            { limit: 600000, oran: 0.16 },
+            { limit: 600000, oran: 0.15 },
+            { limit: 1200000, oran: 0.14 },
+            { limit: 1200000, oran: 0.13 },
+            { limit: 1800000, oran: 0.11 },
+            { limit: 2400000, oran: 0.08 },
+            { limit: 3000000, oran: 0.05 },
+            { limit: 3600000, oran: 0.03 },
+            { limit: Infinity, oran: 0.01 }
+        ],
+        erkenOdemeOrani: 0.75,
+        masraflar: {
+            basvuruHarci: 615.40,
+            vekaletnameHarci: 87.50,
+            vekaletPulu: 138.00,
+            tebligatUcreti: 250,
+            dosyaMasrafi: 100
+        },
+        oranlar: {
+            pesinHarc: 0.005,
+            tahsilHarciHacizOncesi: 0.0455,
+            tahsilHarciHaricen: 0.0227
+        }
     }
 };
+
+// Aktif Tarife (Varsayılan 2026)
+let aktifIcraYili = '2026';
+let ICRA_AAUT = ICRA_VERILERI[aktifIcraYili];
 
 // İcra Vekalet Ücreti Hesaplama Servisi
 const IcraVekaletService = {
@@ -239,6 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Form elementleri
     const icraForm = document.getElementById('icra-form');
+    const icraYilSelect = document.getElementById('icra-yil');
     const hesapTuruSelect = document.getElementById('icra-hesap-turu');
     const anaparaAlani = document.getElementById('icra-anapara-alani');
     const vekaletAlani = document.getElementById('icra-vekalet-alani');
@@ -254,6 +278,18 @@ document.addEventListener('DOMContentLoaded', function () {
     if (anaparaInput) InputMask.attach(anaparaInput);
     if (faizInput) InputMask.attach(faizInput);
     if (vekaletInput) InputMask.attach(vekaletInput);
+
+    // Yıl değişimi
+    if (icraYilSelect) {
+        icraYilSelect.addEventListener('change', function () {
+            aktifIcraYili = this.value;
+            ICRA_AAUT = ICRA_VERILERI[aktifIcraYili];
+            // Eğer sonuç varsa yeniden hesaplat
+            if (icraResult.style.display !== 'none') {
+                icraForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    }
 
     // Hesaplama yöntemi değişimi
     if (hesapTuruSelect) {
@@ -362,6 +398,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span>Masraflar:</span>
                         <span>${Utils.escapeHTML(Utils.formatCurrency(ko.masraflar))}</span>
                     </div>
+                    <div class="cost-breakdown">
+                        <div><span>• Başvuru Harcı:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.basvuruHarci)}</span></div>
+                        <div><span>• Vekalet Suret:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.vekaletnameHarci)}</span></div>
+                        <div><span>• Vekalet Pulu:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.vekaletPulu)}</span></div>
+                        <div><span>• Tebligat/Posta:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.tebligatUcreti)}</span></div>
+                        <div><span>• Dosya Masrafı:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.dosyaMasrafi)}</span></div>
+                    </div>
                     <div class="result-item" style="font-size: 18px; font-weight: bold; background: #dbeafe; padding: 10px; border-radius: 5px; margin-top: 10px;">
                         <span>TOPLAM:</span>
                         <div>
@@ -403,6 +446,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="result-item">
                         <span>Masraflar:</span>
                         <span>${Utils.escapeHTML(Utils.formatCurrency(ks.masraflar))}</span>
+                    </div>
+                    <div class="cost-breakdown">
+                        <div><span>• Başvuru Harcı:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.basvuruHarci)}</span></div>
+                        <div><span>• Vekalet Suret:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.vekaletnameHarci)}</span></div>
+                        <div><span>• Vekalet Pulu:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.vekaletPulu)}</span></div>
+                        <div><span>• Tebligat/Posta:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.tebligatUcreti)}</span></div>
+                        <div><span>• Dosya Masrafı:</span> <span>${Utils.formatCurrency(ICRA_AAUT.masraflar.dosyaMasrafi)}</span></div>
                     </div>
                     <div class="result-item" style="font-size: 18px; font-weight: bold; background: #dcfce7; padding: 10px; border-radius: 5px; margin-top: 10px;">
                         <span>TOPLAM:</span>
