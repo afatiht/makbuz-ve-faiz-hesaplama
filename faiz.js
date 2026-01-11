@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Güncel avans faizi oranı (2024-2025): %55
                 const VARSAYILAN_TEMERRUT_ORANI = 55; // Avans faiz oranı
 
-                if (faizOrani === 0 || faizOrani < VARSAYILAN_TEMERRUT_ORANI) {
+                if (faizOrani === 0) {
                     kullanilacakOran = VARSAYILAN_TEMERRUT_ORANI;
                     faizOraniInput.value = Utils.formatNumber(VARSAYILAN_TEMERRUT_ORANI);
                 }
